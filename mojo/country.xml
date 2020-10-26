@@ -1,0 +1,154 @@
+<Objs Version="1.1.0.1" xmlns="http://schemas.microsoft.com/powershell/2004/04">
+  <Obj RefId="0">
+    <TN RefId="0">
+      <T>System.Object[]</T>
+      <T>System.Array</T>
+      <T>System.Object</T>
+    </TN>
+    <LST>
+      <Obj RefId="1">
+        <TN RefId="1">
+          <T>country</T>
+          <T>System.Object</T>
+        </TN>
+        <ToString>country</ToString>
+        <Props>
+          <S N="Name">United States</S>
+          <S N="Query_Name">US</S>
+          <I32 N="Infected_Today">8637108</I32>
+          <I32 N="Infected_Yesterday">8579672</I32>
+          <I32 N="Infected_Delta">57436</I32>
+          <I32 N="Dead_Today">225239</I32>
+          <I32 N="Dead_Yesterday">224906</I32>
+          <I32 N="Dead_Delta">333</I32>
+        </Props>
+      </Obj>
+      <Obj RefId="2">
+        <TNRef RefId="1" />
+        <ToString>country</ToString>
+        <Props>
+          <S N="Name">India</S>
+          <S N="Query_Name">IN</S>
+          <I32 N="Infected_Today">7909959</I32>
+          <I32 N="Infected_Yesterday">7864811</I32>
+          <I32 N="Infected_Delta">45148</I32>
+          <I32 N="Dead_Today">119014</I32>
+          <I32 N="Dead_Yesterday">118534</I32>
+          <I32 N="Dead_Delta">480</I32>
+        </Props>
+      </Obj>
+      <Obj RefId="3">
+        <TNRef RefId="1" />
+        <ToString>country</ToString>
+        <Props>
+          <S N="Name">Brazil</S>
+          <S N="Query_Name">BR</S>
+          <I32 N="Infected_Today">5394128</I32>
+          <I32 N="Infected_Yesterday">5380635</I32>
+          <I32 N="Infected_Delta">13493</I32>
+          <I32 N="Dead_Today">157134</I32>
+          <I32 N="Dead_Yesterday">156903</I32>
+          <I32 N="Dead_Delta">231</I32>
+        </Props>
+      </Obj>
+      <Obj RefId="4">
+        <TNRef RefId="1" />
+        <ToString>country</ToString>
+        <Props>
+          <S N="Name">Russia</S>
+          <S N="Query_Name">RU</S>
+          <I32 N="Infected_Today">1520800</I32>
+          <I32 N="Infected_Yesterday">1503652</I32>
+          <I32 N="Infected_Delta">17148</I32>
+          <I32 N="Dead_Today">26092</I32>
+          <I32 N="Dead_Yesterday">25875</I32>
+          <I32 N="Dead_Delta">217</I32>
+        </Props>
+      </Obj>
+      <Obj RefId="5">
+        <TNRef RefId="1" />
+        <ToString>country</ToString>
+        <Props>
+          <S N="Name">France</S>
+          <S N="Query_Name">FR</S>
+          <I32 N="Infected_Today">1182153</I32>
+          <I32 N="Infected_Yesterday">1130081</I32>
+          <I32 N="Infected_Delta">52072</I32>
+          <I32 N="Dead_Today">34789</I32>
+          <I32 N="Dead_Yesterday">34673</I32>
+          <I32 N="Dead_Delta">116</I32>
+        </Props>
+      </Obj>
+      <Obj RefId="6">
+        <TNRef RefId="1" />
+        <ToString>country</ToString>
+        <Props>
+          <S N="Name">Spain</S>
+          <S N="Query_Name">ES</S>
+          <I32 N="Infected_Today">1046132</I32>
+          <I32 N="Infected_Yesterday">1046132</I32>
+          <I32 N="Infected_Delta">0</I32>
+          <I32 N="Dead_Today">34752</I32>
+          <I32 N="Dead_Yesterday">34752</I32>
+          <I32 N="Dead_Delta">0</I32>
+        </Props>
+      </Obj>
+      <Obj RefId="7">
+        <TNRef RefId="1" />
+        <ToString>country</ToString>
+        <Props>
+          <S N="Name">Mexico</S>
+          <S N="Query_Name">MX</S>
+          <I32 N="Infected_Today">891160</I32>
+          <I32 N="Infected_Yesterday">886800</I32>
+          <I32 N="Infected_Delta">4360</I32>
+          <I32 N="Dead_Today">88924</I32>
+          <I32 N="Dead_Yesterday">88743</I32>
+          <I32 N="Dead_Delta">181</I32>
+        </Props>
+      </Obj>
+      <Obj RefId="8">
+        <TNRef RefId="1" />
+        <ToString>country</ToString>
+        <Props>
+          <S N="Name">South Africa</S>
+          <S N="Query_Name">ZAF</S>
+          <I32 N="Infected_Today">715868</I32>
+          <I32 N="Infected_Yesterday">714246</I32>
+          <I32 N="Infected_Delta">1622</I32>
+          <I32 N="Dead_Today">18968</I32>
+          <I32 N="Dead_Yesterday">18944</I32>
+          <I32 N="Dead_Delta">24</I32>
+        </Props>
+      </Obj>
+      <Obj RefId="9">
+        <TNRef RefId="1" />
+        <ToString>country</ToString>
+        <Props>
+          <S N="Name">Iran</S>
+          <S N="Query_Name">IR</S>
+          <I32 N="Infected_Today">574856</I32>
+          <I32 N="Infected_Yesterday">568896</I32>
+          <I32 N="Infected_Delta">5960</I32>
+          <I32 N="Dead_Today">32953</I32>
+          <I32 N="Dead_Yesterday">32616</I32>
+          <I32 N="Dead_Delta">337</I32>
+        </Props>
+      </Obj>
+      <Obj RefId="10">
+        <TNRef RefId="1" />
+        <ToString>country</ToString>
+        <Props>
+          <S N="Name">Australia</S>
+          <S N="Query_Name">AUS</S>
+          <I32 N="Infected_Today">27527</I32>
+          <I32 N="Infected_Yesterday">27520</I32>
+          <I32 N="Infected_Delta">7</I32>
+          <I32 N="Dead_Today">905</I32>
+          <I32 N="Dead_Yesterday">905</I32>
+          <I32 N="Dead_Delta">0</I32>
+        </Props>
+      </Obj>
+    </LST>
+  </Obj>
+</Objs>
