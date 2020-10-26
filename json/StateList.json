@@ -1,0 +1,327 @@
+{
+  "states": [
+  {
+    "State": "Alabama",
+    "Abbrev": "Ala.",
+    "Code": "AL",
+    "Population": 4903185
+  },
+  {
+    "State": "Alaska",
+    "Abbrev": "Alaska",
+    "Code": "AK",
+    "Population": 731545
+  },
+  {
+    "State": "Arizona",
+    "Abbrev": "Ariz.",
+    "Code": "AZ",
+    "Population": 7278717
+  },
+  {
+    "State": "Arkansas",
+    "Abbrev": "Ark.",
+    "Code": "AR",
+    "Population": 3017825
+  },
+  {
+    "State": "California",
+    "Abbrev": "Calif.",
+    "Code": "CA",
+    "Population": 39512223
+  },
+  {
+    "State": "Colorado",
+    "Abbrev": "Colo.",
+    "Code": "CO",
+    "Population": 5758736
+  },
+  {
+    "State": "Connecticut",
+    "Abbrev": "Conn.",
+    "Code": "CT",
+    "Population": 3565287
+  },
+  {
+    "State": "Delaware",
+    "Abbrev": "Del.",
+    "Code": "DE",
+    "Population": 973764
+  },
+  {
+    "State": "District of Columbia",
+    "Abbrev": "D.C.",
+    "Code": "DC",
+    "Population": 705749
+  },
+  {
+    "State": "Florida",
+    "Abbrev": "Fla.",
+    "Code": "FL",
+    "Population": 21477737
+  },
+  {
+    "State": "Georgia",
+    "Abbrev": "Ga.",
+    "Code": "GA",
+    "Population": 10617423
+  },
+  {
+    "State": "Guam",
+    "Abbrev": "Gua.",
+    "Code": "GU",
+    "Population": 165718
+  },
+  {
+    "State": "Hawaii",
+    "Abbrev": "Hawaii",
+    "Code": "HI",
+    "Population": 1415872
+  },
+  {
+    "State": "Idaho",
+    "Abbrev": "Idaho",
+    "Code": "ID",
+    "Population": 1787065
+  },
+  {
+    "State": "Illinois",
+    "Abbrev": "Ill.",
+    "Code": "IL",
+    "Population": 12671821
+  },
+  {
+    "State": "Indiana",
+    "Abbrev": "Ind.",
+    "Code": "IN",
+    "Population": 6732219
+  },
+  {
+    "State": "Iowa",
+    "Abbrev": "Iowa",
+    "Code": "IA",
+    "Population": 3155070
+  },
+  {
+    "State": "Kansas",
+    "Abbrev": "Kans.",
+    "Code": "KS",
+    "Population": 2913314
+  },
+  {
+    "State": "Kentucky",
+    "Abbrev": "Ky.",
+    "Code": "KY",
+    "Population": 4467673
+  },
+  {
+    "State": "Louisiana",
+    "Abbrev": "La.",
+    "Code": "LA",
+    "Population": 4648794
+  },
+  {
+    "State": "Maine",
+    "Abbrev": "Maine",
+    "Code": "ME",
+    "Population": 1344212
+  },
+  {
+    "State": "Maryland",
+    "Abbrev": "Md.",
+    "Code": "MD",
+    "Population": 6045680
+  },
+  {
+    "State": "Massachusetts",
+    "Abbrev": "Mass.",
+    "Code": "MA",
+    "Population": 6949503
+  },
+  {
+    "State": "Michigan",
+    "Abbrev": "Mich.",
+    "Code": "MI",
+    "Population": 9986857
+  },
+  {
+    "State": "Minnesota",
+    "Abbrev": "Minn.",
+    "Code": "MN",
+    "Population": 5639632
+  },
+  {
+    "State": "Mississippi",
+    "Abbrev": "Miss.",
+    "Code": "MS",
+    "Population": 2976149
+  },
+  {
+    "State": "Missouri",
+    "Abbrev": "Mo.",
+    "Code": "MO",
+    "Population": 6137428
+  },
+  {
+    "State": "Montana",
+    "Abbrev": "Mont.",
+    "Code": "MT",
+    "Population": 1068778
+  },
+  {
+    "State": "Nebraska",
+    "Abbrev": "Nebr.",
+    "Code": "NE",
+    "Population": 1934408
+  },
+  {
+    "State": "Nevada",
+    "Abbrev": "Nev.",
+    "Code": "NV",
+    "Population": 3080156
+  },
+  {
+    "State": "New Hampshire",
+    "Abbrev": "N.H.",
+    "Code": "NH",
+    "Population": 1359711
+  },
+  {
+    "State": "New Jersey",
+    "Abbrev": "N.J.",
+    "Code": "NJ",
+    "Population": 8882190
+  },
+  {
+    "State": "New Mexico",
+    "Abbrev": "N.M.",
+    "Code": "NM",
+    "Population": 2096829
+  },
+  {
+    "State": "New York",
+    "Abbrev": "N.Y.",
+    "Code": "NY",
+    "Population": 19453561
+  },
+  {
+    "State": "North Carolina",
+    "Abbrev": "N.C.",
+    "Code": "NC",
+    "Population": 10488084
+  },
+  {
+    "State": "North Dakota",
+    "Abbrev": "N.D.",
+    "Code": "ND",
+    "Population": 762062
+  },
+  {
+    "State": "Northern Mariana Islands",
+    "Abbrev": "US-MP",
+    "Code": "MP",
+    "Population": 55194
+  },
+  {
+    "State": "Ohio",
+    "Abbrev": "Ohio",
+    "Code": "OH",
+    "Population": 11689100
+  },
+  {
+    "State": "Oklahoma",
+    "Abbrev": "Okla.",
+    "Code": "OK",
+    "Population": 3956971
+  },
+  {
+    "State": "Oregon",
+    "Abbrev": "Ore.",
+    "Code": "OR",
+    "Population": 4217737
+  },
+  {
+    "State": "Pennsylvania",
+    "Abbrev": "Pa.",
+    "Code": "PA",
+    "Population": 12801989
+  },
+  {
+    "State": "Rhode Island",
+    "Abbrev": "R.I.",
+    "Code": "RI",
+    "Population": 1059361
+  },
+  {
+    "State": "South Carolina",
+    "Abbrev": "S.C.",
+    "Code": "SC",
+    "Population": 5148714
+  },
+  {
+    "State": "South Dakota",
+    "Abbrev": "S.D.",
+    "Code": "SD",
+    "Population": 884659
+  },
+  {
+    "State": "Tennessee",
+    "Abbrev": "Tenn.",
+    "Code": "TN",
+    "Population": 6833174
+  },
+  {
+    "State": "Texas",
+    "Abbrev": "Tex.",
+    "Code": "TX",
+    "Population": 28995881
+  },
+  {
+    "State": "Utah",
+    "Abbrev": "Utah",
+    "Code": "UT",
+    "Population": 3205958
+  },
+  {
+    "State": "Vermont",
+    "Abbrev": "Vt.",
+    "Code": "VT",
+    "Population": 623989
+  },
+  {
+    "State": "Virginia",
+    "Abbrev": "Va.",
+    "Code": "VA",
+    "Population": 8535519
+  },
+  {
+    "State": "Virgin Islands",
+    "Abbrev": "US-VI",
+    "Code": "VI",
+    "Population": 104914
+  },
+  {
+    "State": "Washington",
+    "Abbrev": "Wash.",
+    "Code": "WA",
+    "Population": 7614893
+  },
+  {
+    "State": "West Virginia",
+    "Abbrev": "W.Va.",
+    "Code": "WV",
+    "Population": 1792147
+  },
+  {
+    "State": "Wisconsin",
+    "Abbrev": "Wis.",
+    "Code": "WI",
+    "Population": 5822434
+  },
+  {
+    "State": "Wyoming",
+    "Abbrev": "Wyo.",
+    "Code": "WY",
+    "Population": 578759
+  }
+]}
