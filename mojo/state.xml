@@ -1,0 +1,116 @@
+<Objs Version="1.1.0.1" xmlns="http://schemas.microsoft.com/powershell/2004/04">
+  <Obj RefId="0">
+    <TN RefId="0">
+      <T>System.Object[]</T>
+      <T>System.Array</T>
+      <T>System.Object</T>
+    </TN>
+    <LST>
+      <Obj RefId="1">
+        <TN RefId="1">
+          <T>state</T>
+          <T>System.Object</T>
+        </TN>
+        <ToString>state</ToString>
+        <Props>
+          <S N="Name">California</S>
+          <S N="Query_Name">ca</S>
+          <I32 N="Infected_Today">898029</I32>
+          <I32 N="Infected_Yesterday">892810</I32>
+          <I32 N="Infected_Delta">5219</I32>
+          <I32 N="Hospitalized_Today">2969</I32>
+          <I32 N="Hospitalized_Yesterday">3007</I32>
+          <I32 N="Hospitalized_Delta">-38</I32>
+          <I32 N="Dead_Today">17345</I32>
+          <I32 N="Dead_Yesterday">17311</I32>
+          <I32 N="Dead_Delta">34</I32>
+        </Props>
+      </Obj>
+      <Obj RefId="2">
+        <TNRef RefId="1" />
+        <ToString>state</ToString>
+        <Props>
+          <S N="Name">Texas</S>
+          <S N="Query_Name">tx</S>
+          <I32 N="Infected_Today">862375</I32>
+          <I32 N="Infected_Yesterday">858071</I32>
+          <I32 N="Infected_Delta">4304</I32>
+          <I32 N="Hospitalized_Today">5206</I32>
+          <I32 N="Hospitalized_Yesterday">4995</I32>
+          <I32 N="Hospitalized_Delta">211</I32>
+          <I32 N="Dead_Today">17504</I32>
+          <I32 N="Dead_Yesterday">17456</I32>
+          <I32 N="Dead_Delta">48</I32>
+        </Props>
+      </Obj>
+      <Obj RefId="3">
+        <TNRef RefId="1" />
+        <ToString>state</ToString>
+        <Props>
+          <S N="Name">Florida</S>
+          <S N="Query_Name">fl</S>
+          <I32 N="Infected_Today">778636</I32>
+          <I32 N="Infected_Yesterday">776251</I32>
+          <I32 N="Infected_Delta">2385</I32>
+          <I32 N="Hospitalized_Today">2219</I32>
+          <I32 N="Hospitalized_Yesterday">2162</I32>
+          <I32 N="Hospitalized_Delta">57</I32>
+          <I32 N="Dead_Today">16632</I32>
+          <I32 N="Dead_Yesterday">16620</I32>
+          <I32 N="Dead_Delta">12</I32>
+        </Props>
+      </Obj>
+      <Obj RefId="4">
+        <TNRef RefId="1" />
+        <ToString>state</ToString>
+        <Props>
+          <S N="Name">Illinois</S>
+          <S N="Query_Name">il</S>
+          <I32 N="Infected_Today">378969</I32>
+          <I32 N="Infected_Yesterday">374907</I32>
+          <I32 N="Infected_Delta">4062</I32>
+          <I32 N="Hospitalized_Today">2605</I32>
+          <I32 N="Hospitalized_Yesterday">2616</I32>
+          <I32 N="Hospitalized_Delta">-11</I32>
+          <I32 N="Dead_Today">9775</I32>
+          <I32 N="Dead_Yesterday">9751</I32>
+          <I32 N="Dead_Delta">24</I32>
+        </Props>
+      </Obj>
+      <Obj RefId="5">
+        <TNRef RefId="1" />
+        <ToString>state</ToString>
+        <Props>
+          <S N="Name">Georgia</S>
+          <S N="Query_Name">ga</S>
+          <I32 N="Infected_Today">350923</I32>
+          <I32 N="Infected_Yesterday">349605</I32>
+          <I32 N="Infected_Delta">1318</I32>
+          <I32 N="Hospitalized_Today">1668</I32>
+          <I32 N="Hospitalized_Yesterday">1684</I32>
+          <I32 N="Hospitalized_Delta">-16</I32>
+          <I32 N="Dead_Today">7809</I32>
+          <I32 N="Dead_Yesterday">7808</I32>
+          <I32 N="Dead_Delta">1</I32>
+        </Props>
+      </Obj>
+      <Obj RefId="6">
+        <TNRef RefId="1" />
+        <ToString>state</ToString>
+        <Props>
+          <S N="Name">Arizona</S>
+          <S N="Query_Name">az</S>
+          <I32 N="Infected_Today">238163</I32>
+          <I32 N="Infected_Yesterday">236772</I32>
+          <I32 N="Infected_Delta">1391</I32>
+          <I32 N="Hospitalized_Today">828</I32>
+          <I32 N="Hospitalized_Yesterday">819</I32>
+          <I32 N="Hospitalized_Delta">9</I32>
+          <I32 N="Dead_Today">5874</I32>
+          <I32 N="Dead_Yesterday">5869</I32>
+          <I32 N="Dead_Delta">5</I32>
+        </Props>
+      </Obj>
+    </LST>
+  </Obj>
+</Objs>
