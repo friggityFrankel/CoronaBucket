@@ -7,6 +7,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClassLibrary", "ClassLibrar
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CovidNumbers", "CovidNumbers\CovidNumbers.csproj", "{07895C18-AB05-4BD5-8695-74EAC72F2986}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "mojo", "mojo", "{425652FA-9A6C-4691-B444-5982F4471DAD}"
+	ProjectSection(SolutionItems) = preProject
+		D:\temp\CoronaBucket\BucketScript.ps1 = D:\temp\CoronaBucket\BucketScript.ps1
+		D:\temp\CoronaBucket\country.xml = D:\temp\CoronaBucket\country.xml
+		D:\temp\CoronaBucket\state.xml = D:\temp\CoronaBucket\state.xml
+		D:\temp\CoronaBucket\worldwide.xml = D:\temp\CoronaBucket\worldwide.xml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
