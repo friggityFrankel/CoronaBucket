@@ -1,0 +1,24 @@
+<Objs Version="1.1.0.1" xmlns="http://schemas.microsoft.com/powershell/2004/04">
+  <Obj RefId="0">
+    <TN RefId="0">
+      <T>worldwide</T>
+      <T>System.Object</T>
+    </TN>
+    <ToString>worldwide</ToString>
+    <Props>
+      <S N="Name">World Wide</S>
+      <I32 N="Infected_Today">43150456</I32>
+      <I32 N="Infected_Yesterday">42761230</I32>
+      <I32 N="Infected_Delta">389226</I32>
+      <I32 N="Dead_Today">1155438</I32>
+      <I32 N="Dead_Yesterday">1151225</I32>
+      <I32 N="Dead_Delta">4213</I32>
+      <I32 N="Recovered_Today">29004035</I32>
+      <I32 N="Recovered_Yesterday">28827223</I32>
+      <I32 N="Recovered_Delta">176812</I32>
+      <I32 N="Unresolved_Today">12990983</I32>
+      <I32 N="Unresolved_Yesterday">12782782</I32>
+      <I32 N="Unresolved_Delta">208201</I32>
+    </Props>
+  </Obj>
+</Objs>
