@@ -20,6 +20,8 @@ namespace CovidNumbers
             var results = GetResults();
             var sortedResults = SortResults(results);
 
+            //WriteStateResults(sortedResults.SingleOrDefault(r => r.Name == "US"), "SD");
+
             WriteWorldResults();
             WriteCountryResults(sortedResults);
             WriteUSResults(sortedResults.SingleOrDefault(r => r.Name == "US"));
@@ -480,6 +482,19 @@ namespace CovidNumbers
                         lines.Add("");
                     }
                 }
+            }
+
+            File.WriteAllLines(Path.Combine(filePath, txtFile), lines);
+        }
+
+        private static void WriteStateResults(Region region, string stateAbbr)
+        {
+            var state = region.States.SingleOrDefault(s => s.Abbr == stateAbbr);
+            var txtFile = $"{DateTime.Now.ToString("MMdd")}_SDcsv.txt";
+            var lines = new List<string>();
+            foreach (var item in state.Cases)
+            {
+                lines.Add($"{item.Date:yyyy-MM-dd} {item.Confirmed} {item.Deaths}");
             }
 
             File.WriteAllLines(Path.Combine(filePath, txtFile), lines);
