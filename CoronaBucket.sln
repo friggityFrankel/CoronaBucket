@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30503.244
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClassLibrary", "ClassLibrary\ClassLibrary.csproj", "{414D113F-57A7-4A6A-B0C7-AAB2CEAC9752}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClassLibrary", "ClassLibrary\ClassLibrary.csproj", "{414D113F-57A7-4A6A-B0C7-AAB2CEAC9752}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CovidNumbers", "CovidNumbers\CovidNumbers.csproj", "{07895C18-AB05-4BD5-8695-74EAC72F2986}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CovidNumbers", "CovidNumbers\CovidNumbers.csproj", "{07895C18-AB05-4BD5-8695-74EAC72F2986}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "mojo", "mojo", "{425652FA-9A6C-4691-B444-5982F4471DAD}"
 	ProjectSection(SolutionItems) = preProject

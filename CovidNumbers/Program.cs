@@ -12,7 +12,7 @@ namespace CovidNumbers
     class Program
     {
         static DateTime startDate = new DateTime(2020, 1, 1);
-        //static DateTime startDate = DateTime.Today.AddDays(-2);
+        //static DateTime startDate = DateTime.Today.AddDays(-3);
         static string filePath = @"D:\temp\";
 
         static void Main(string[] args)
@@ -20,7 +20,7 @@ namespace CovidNumbers
             var results = GetResults();
             var sortedResults = SortResults(results);
 
-            WriteWorldResults(sortedResults);
+            WriteWorldResults();
             WriteCountryResults(sortedResults);
             WriteUSResults(sortedResults.SingleOrDefault(r => r.Name == "US"));
 
@@ -416,7 +416,7 @@ namespace CovidNumbers
             Console.WriteLine("Write to world file successful");
         }
 
-        private static void WriteWorldResults(List<Region> regions)
+        private static void WriteWorldResults()
         {
             var checkDate = DateTime.Today.AddDays(-2);
             var txtFile = $"{DateTime.Now.ToString("MMdd")}_World.txt";
@@ -424,13 +424,13 @@ namespace CovidNumbers
             var current = GetCurrentWorld();
             var change = GetDailyResults(checkDate);
 
-            lines.Add(@"b{World Wide}b totals:");
-            lines.Add(@"y{Cases}y: " + current.Confirmed.ToString("N0", CultureInfo.CurrentCulture) + " (+" + (current.Confirmed - change.Confirmed).ToString("N0", CultureInfo.CurrentCulture) + ")");
-            lines.Add(@"r{Deaths}r: " + current.Deaths.ToString("N0", CultureInfo.CurrentCulture) + " (+" + (current.Deaths - change.Deaths).ToString("N0", CultureInfo.CurrentCulture) + ")");
-            lines.Add(@"g{Recovered}g: " + current.Recovered.ToString("N0", CultureInfo.CurrentCulture) + " (+" + (current.Recovered - change.Recovered).ToString("N0", CultureInfo.CurrentCulture) + ")");
-            lines.Add(@"p[Unresolved]p: " + current.Unresolved.ToString("N0", CultureInfo.CurrentCulture) + " (+" + (current.Unresolved - change.Unresolved).ToString("N0", CultureInfo.CurrentCulture)+ ")");
+            lines.Add("b{World Wide}b totals:");
+            lines.Add($"y{{Cases}}y: {current.Confirmed.ToString("N0", CultureInfo.CurrentCulture)} (+{(current.Confirmed - change.Confirmed).ToString("N0", CultureInfo.CurrentCulture)})");
+            lines.Add($"r{{Deaths}}r: {current.Deaths.ToString("N0", CultureInfo.CurrentCulture)} (+{(current.Deaths - change.Deaths).ToString("N0", CultureInfo.CurrentCulture)})");
+            lines.Add($"g{{Recovered}}g: {current.Recovered.ToString("N0", CultureInfo.CurrentCulture)} (+{(current.Recovered - change.Recovered).ToString("N0", CultureInfo.CurrentCulture)})");
+            lines.Add($"p[Unresolved]p: {current.Unresolved.ToString("N0", CultureInfo.CurrentCulture)} (+{(current.Unresolved - change.Unresolved).ToString("N0", CultureInfo.CurrentCulture)})");
             lines.Add("");
-            lines.Add(@"r{U}rb[S]bb{A}b totals:");
+            lines.Add("r{U}rb[S]bb{A}b totals:");
 
             File.WriteAllLines(Path.Combine(filePath, txtFile), lines);
         }
@@ -473,8 +473,8 @@ namespace CovidNumbers
                     {
                         var change = state.Change(checkDate);
 
-                        lines.Add($"b[{state.Name}]b /[pop. {state.Population.ToString("N0", CultureInfo.CurrentCulture)}]/");
-                        lines.Add($"Cases: {state.CurrentCases.Confirmed.ToString("N0", CultureInfo.CurrentCulture)} (+{change.Confirmed.ToString("N0", CultureInfo.CurrentCulture)}) ({state.CurrentPercentage.Confirmed}%)");
+                        lines.Add($"b[{state.Name}]b s[/[pop. {state.Population.ToString("N0", CultureInfo.CurrentCulture)}]/]s");
+                        lines.Add($"Cases: {state.CurrentCases.Confirmed.ToString("N0", CultureInfo.CurrentCulture)} (+{change.Confirmed.ToString("N0", CultureInfo.CurrentCulture)}) ({state.CurrentPercentage.Confirmed.ToString("N2", CultureInfo.CurrentCulture)}%)");
                         lines.Add($"Deaths: {state.CurrentCases.Deaths.ToString("N0", CultureInfo.CurrentCulture)} (+{change.Deaths.ToString("N0", CultureInfo.CurrentCulture)})");
                         lines.Add($"Hospitalized: {state.CurrentCases.Hospitalized.ToString("N0", CultureInfo.CurrentCulture)} (+{state.CurrentCases.HospitalizedChange.ToString("N0", CultureInfo.CurrentCulture)})");
                         lines.Add("");

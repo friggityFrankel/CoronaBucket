@@ -56,9 +56,9 @@ namespace ClassLibrary
                 CaseNumbers percentages = new CaseNumbers(DateTime.Today);
                 if (Population > 0)
                 {
-                    percentages.Confirmed = CurrentCases.Confirmed * 100 / Population;
-                    percentages.Deaths = CurrentCases.Deaths * 100 / Population;
-                    percentages.Recovered = CurrentCases.Recovered * 100 / Population;
+                    percentages.Confirmed = CurrentCases.Confirmed * 100.0 / Population;
+                    percentages.Deaths = CurrentCases.Deaths * 100.0 / Population;
+                    percentages.Recovered = CurrentCases.Recovered * 100.0 / Population;
                 }
                 return percentages;
             }

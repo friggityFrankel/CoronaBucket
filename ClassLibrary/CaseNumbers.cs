@@ -5,9 +5,9 @@ namespace ClassLibrary
     public class CaseNumbers
     {
         public DateTime Date;
-        public int Confirmed;
-        public int Deaths;
-        public int Recovered;
+        public double Confirmed;
+        public double Deaths;
+        public double Recovered;
         public int Hospitalized;
         public int HospitalizedChange;
 
@@ -19,7 +19,7 @@ namespace ClassLibrary
             Recovered = 0;
         }
 
-        public int Unresolved
+        public double Unresolved
         {
             get
             {
