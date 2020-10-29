@@ -115,17 +115,17 @@ namespace CovidNumbers
                     {
                         if (!string.IsNullOrWhiteSpace(item.confirmed))
                         {
-                            int.TryParse(item.confirmed, out int confirmed);
+                            double.TryParse(item.confirmed, out double confirmed);
                             cases.Confirmed += confirmed;
                         }
                         if (!string.IsNullOrWhiteSpace(item.deaths))
                         {
-                            int.TryParse(item.deaths, out int deaths);
+                            double.TryParse(item.deaths, out double deaths);
                             cases.Deaths += deaths;
                         }
                         if (!string.IsNullOrWhiteSpace(item.recovered))
                         {
-                            int.TryParse(item.recovered, out int recovered);
+                            double.TryParse(item.recovered, out double recovered);
                             cases.Recovered += recovered;
                         }
                     }
@@ -311,9 +311,9 @@ namespace CovidNumbers
 
                 foreach (var item in dayList)
                 {
-                    int.TryParse(item.confirmed, out int confirmed);
-                    int.TryParse(item.deaths, out int deaths);
-                    int.TryParse(item.recovered, out int recovered);
+                    double.TryParse(item.confirmed, out double confirmed);
+                    double.TryParse(item.deaths, out double deaths);
+                    double.TryParse(item.recovered, out double recovered);
 
                     var caseNumbers = new CaseNumbers(i);
                     caseNumbers.Confirmed = confirmed;
@@ -394,9 +394,9 @@ namespace CovidNumbers
 
                 foreach (var item in dayList)
                 {
-                    int.TryParse(item.confirmed, out int confirmed);
-                    int.TryParse(item.deaths, out int deaths);
-                    int.TryParse(item.recovered, out int recovered);
+                    double.TryParse(item.confirmed, out double confirmed);
+                    double.TryParse(item.deaths, out double deaths);
+                    double.TryParse(item.recovered, out double recovered);
 
                     worldCases.Confirmed += confirmed;
                     worldCases.Deaths += deaths;
@@ -464,9 +464,9 @@ namespace CovidNumbers
             var sortedStates = states.States.OrderByDescending(s => s.Change(checkDate).Confirmed);
             var txtFile = $"{DateTime.Now.ToString("MMdd")}_TopStates.txt";
             var lines = new List<string>();
-            lines.Add("e[US States by Gains]e");
+            lines.Add("e[Top 10 US States by Gains]e");
             lines.Add("");
-            foreach (var state in sortedStates)
+            foreach (var state in sortedStates.Take(10))
             {
                 if (state.CurrentCases.Confirmed > 0)
                 {
@@ -475,8 +475,27 @@ namespace CovidNumbers
                     {
                         var change = state.Change(checkDate);
 
-                        lines.Add($"b[{state.Name}]b s[/[pop. {state.Population.ToString("N0", CultureInfo.CurrentCulture)}]/]s");
-                        lines.Add($"Cases: {state.CurrentCases.Confirmed.ToString("N0", CultureInfo.CurrentCulture)} (+{change.Confirmed.ToString("N0", CultureInfo.CurrentCulture)}) ({state.CurrentPercentage.Confirmed.ToString("N2", CultureInfo.CurrentCulture)}%)");
+                        lines.Add($"b[{state.Name}]b s[pop. {state.Population.ToString("N0", CultureInfo.CurrentCulture)}]s");
+                        lines.Add($"Cases: {state.CurrentCases.Confirmed.ToString("N0", CultureInfo.CurrentCulture)} s[{state.CurrentPercentage.Confirmed.ToString("N2", CultureInfo.CurrentCulture)}%]s (+{change.Confirmed.ToString("N0", CultureInfo.CurrentCulture)})");
+                        lines.Add($"Deaths: {state.CurrentCases.Deaths.ToString("N0", CultureInfo.CurrentCulture)} (+{change.Deaths.ToString("N0", CultureInfo.CurrentCulture)})");
+                        lines.Add($"Hospitalized: {state.CurrentCases.Hospitalized.ToString("N0", CultureInfo.CurrentCulture)} (+{state.CurrentCases.HospitalizedChange.ToString("N0", CultureInfo.CurrentCulture)})");
+                        lines.Add("");
+                    }
+                }
+            }
+            lines.Add("e[Remaining US States by Gains]e");
+            lines.Add("");
+            foreach (var state in sortedStates.Skip(10))
+            {
+                if (state.CurrentCases.Confirmed > 0)
+                {
+                    var cases = state.Cases.SingleOrDefault(c => c.Date == checkDate);
+                    if (cases != null)
+                    {
+                        var change = state.Change(checkDate);
+
+                        lines.Add($"b[{state.Name}]b s[pop. {state.Population.ToString("N0", CultureInfo.CurrentCulture)}]s");
+                        lines.Add($"Cases: {state.CurrentCases.Confirmed.ToString("N0", CultureInfo.CurrentCulture)} s[{state.CurrentPercentage.Confirmed.ToString("N2", CultureInfo.CurrentCulture)}%]s (+{change.Confirmed.ToString("N0", CultureInfo.CurrentCulture)})");
                         lines.Add($"Deaths: {state.CurrentCases.Deaths.ToString("N0", CultureInfo.CurrentCulture)} (+{change.Deaths.ToString("N0", CultureInfo.CurrentCulture)})");
                         lines.Add($"Hospitalized: {state.CurrentCases.Hospitalized.ToString("N0", CultureInfo.CurrentCulture)} (+{state.CurrentCases.HospitalizedChange.ToString("N0", CultureInfo.CurrentCulture)})");
                         lines.Add("");
