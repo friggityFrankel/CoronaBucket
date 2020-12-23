@@ -11,8 +11,8 @@ namespace CovidNumbers
 {
     class Program
     {
-        static DateTime startDate = new DateTime(2020, 1, 1);
-        //static DateTime startDate = DateTime.Today.AddDays(-3);
+        //static DateTime startDate = new DateTime(2020, 1, 1);
+        static DateTime startDate = DateTime.Today.AddDays(-3);
         static string filePath = @"D:\temp\";
 
         static void Main(string[] args)
@@ -26,7 +26,7 @@ namespace CovidNumbers
             WriteCountryResults(sortedResults);
             WriteUSResults(sortedResults.SingleOrDefault(r => r.Name == "US"));
 
-            WriteCsvResults(results);
+            //WriteCsvResults(results);
         }
 
         static List<ResultData> GetResults()
@@ -462,43 +462,72 @@ namespace CovidNumbers
         {
             var checkDate = DateTime.Today.AddDays(-1);
             var sortedStates = states.States.OrderByDescending(s => s.Change(checkDate).Confirmed);
+            //var sortedStates = states.States.OrderByDescending(s => s.CurrentPercentage.Confirmed);
             var txtFile = $"{DateTime.Now.ToString("MMdd")}_TopStates.txt";
             var lines = new List<string>();
-            lines.Add("e[Top 10 US States by Gains]e");
-            lines.Add("");
-            foreach (var state in sortedStates.Take(10))
+            lines.Add("e[Top 15 US States by Gains]e");
+            foreach (var state in sortedStates.Take(15))
             {
                 if (state.CurrentCases.Confirmed > 0)
                 {
                     var cases = state.Cases.SingleOrDefault(c => c.Date == checkDate);
                     if (cases != null)
                     {
-                        var change = state.Change(checkDate);
+                        var stateName = $"b[{state.Name}]b s[pop. {state.Population.ToString("N0", CultureInfo.CurrentCulture)}]s";
+                        var stateCases = $"Cases: {state.CurrentCases.Confirmed.ToString("N0", CultureInfo.CurrentCulture)} s[{state.CurrentPercentage.Confirmed.ToString("N2", CultureInfo.CurrentCulture)}%]s";
+                        var stateDeaths = $"Deaths: {state.CurrentCases.Deaths.ToString("N0", CultureInfo.CurrentCulture)}";
 
-                        lines.Add($"b[{state.Name}]b s[pop. {state.Population.ToString("N0", CultureInfo.CurrentCulture)}]s");
-                        lines.Add($"Cases: {state.CurrentCases.Confirmed.ToString("N0", CultureInfo.CurrentCulture)} s[{state.CurrentPercentage.Confirmed.ToString("N2", CultureInfo.CurrentCulture)}%]s (+{change.Confirmed.ToString("N0", CultureInfo.CurrentCulture)})");
-                        lines.Add($"Deaths: {state.CurrentCases.Deaths.ToString("N0", CultureInfo.CurrentCulture)} (+{change.Deaths.ToString("N0", CultureInfo.CurrentCulture)})");
-                        lines.Add($"Hospitalized: {state.CurrentCases.Hospitalized.ToString("N0", CultureInfo.CurrentCulture)} (+{state.CurrentCases.HospitalizedChange.ToString("N0", CultureInfo.CurrentCulture)})");
+                        var change = state.Change(checkDate);
+                        stateCases += (change.Confirmed > 0) ? $" (+{change.Confirmed.ToString("N0", CultureInfo.CurrentCulture)})" : " --";
+                        stateDeaths += (change.Deaths > 0) ? $" (+{change.Deaths.ToString("N0", CultureInfo.CurrentCulture)})" : " --";
+
                         lines.Add("");
+                        lines.Add(stateName);
+                        lines.Add(stateCases);
+                        lines.Add(stateDeaths);
+
+                        if (state.CurrentCases.Hospitalized > 0)
+                        {
+                            var stateHospitalized = $"Hospitalized: {state.CurrentCases.Hospitalized.ToString("N0", CultureInfo.CurrentCulture)}";
+                            stateHospitalized += (state.CurrentCases.HospitalizedChange > 0) ? $" (+{state.CurrentCases.HospitalizedChange.ToString("N0", CultureInfo.CurrentCulture)})" : " --";
+                            lines.Add(stateHospitalized);
+                        }
+
                     }
                 }
             }
-            lines.Add("e[Remaining US States by Gains]e");
             lines.Add("");
-            foreach (var state in sortedStates.Skip(10))
+            lines.Add("");
+            lines.Add("");
+            lines.Add("");
+            lines.Add("");
+            lines.Add("e[Remaining US States by Gains]e");
+            foreach (var state in sortedStates.Skip(15))
             {
                 if (state.CurrentCases.Confirmed > 0)
                 {
                     var cases = state.Cases.SingleOrDefault(c => c.Date == checkDate);
                     if (cases != null)
                     {
-                        var change = state.Change(checkDate);
+                        var stateName = $"b[{state.Name}]b s[pop. {state.Population.ToString("N0", CultureInfo.CurrentCulture)}]s";
+                        var stateCases = $"Cases: {state.CurrentCases.Confirmed.ToString("N0", CultureInfo.CurrentCulture)} s[{state.CurrentPercentage.Confirmed.ToString("N2", CultureInfo.CurrentCulture)}%]s";
+                        var stateDeaths = $"Deaths: {state.CurrentCases.Deaths.ToString("N0", CultureInfo.CurrentCulture)}";
 
-                        lines.Add($"b[{state.Name}]b s[pop. {state.Population.ToString("N0", CultureInfo.CurrentCulture)}]s");
-                        lines.Add($"Cases: {state.CurrentCases.Confirmed.ToString("N0", CultureInfo.CurrentCulture)} s[{state.CurrentPercentage.Confirmed.ToString("N2", CultureInfo.CurrentCulture)}%]s (+{change.Confirmed.ToString("N0", CultureInfo.CurrentCulture)})");
-                        lines.Add($"Deaths: {state.CurrentCases.Deaths.ToString("N0", CultureInfo.CurrentCulture)} (+{change.Deaths.ToString("N0", CultureInfo.CurrentCulture)})");
-                        lines.Add($"Hospitalized: {state.CurrentCases.Hospitalized.ToString("N0", CultureInfo.CurrentCulture)} (+{state.CurrentCases.HospitalizedChange.ToString("N0", CultureInfo.CurrentCulture)})");
+                        var change = state.Change(checkDate);
+                        stateCases += (change.Confirmed > 0) ? $" (+{change.Confirmed.ToString("N0", CultureInfo.CurrentCulture)})" : " --";
+                        stateDeaths += (change.Deaths > 0) ? $" (+{change.Deaths.ToString("N0", CultureInfo.CurrentCulture)})" : " --";
+                      
                         lines.Add("");
+                        lines.Add(stateName);
+                        lines.Add(stateCases);
+                        lines.Add(stateDeaths);
+
+                        if (state.CurrentCases.Hospitalized > 0)
+                        {
+                            var stateHospitalized = $"Hospitalized: {state.CurrentCases.Hospitalized.ToString("N0", CultureInfo.CurrentCulture)}";
+                            stateHospitalized += (state.CurrentCases.HospitalizedChange > 0) ? $" (+{state.CurrentCases.HospitalizedChange.ToString("N0", CultureInfo.CurrentCulture)})" : " --";
+                            lines.Add(stateHospitalized);
+                        }
                     }
                 }
             }
