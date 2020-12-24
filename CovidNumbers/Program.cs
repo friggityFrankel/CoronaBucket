@@ -29,6 +29,24 @@ namespace CovidNumbers
             //WriteCsvResults(results);
         }
 
+        static string GetJsonString(string jsonQuery)
+        {
+            string jsonString = "";
+            using (var client = new HttpClient())
+            {
+                client.BaseAddress = new Uri(jsonQuery);
+                using (var response = client.GetAsync("").Result)
+                {
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var contents = response.Content.ReadAsStringAsync();
+                        jsonString = contents.Result;
+                    }
+                }
+            }
+            return jsonString;
+        }
+
         static List<ResultData> GetResults()
         {
             var resultsList = new List<ResultData>();
@@ -46,21 +64,10 @@ namespace CovidNumbers
                     }
                     else
                     {
-                        using (var client = new HttpClient())
+                        jsonString = GetJsonString($"https://covid19.mathdro.id/api/daily/{i.ToString("MM-dd-yyyy")}");
+                        if (!string.IsNullOrWhiteSpace(jsonString))
                         {
-                            client.BaseAddress = new Uri($"https://covid19.mathdro.id/api/daily/{i.ToString("MM-dd-yyyy")}");
-                            using (var response = client.GetAsync("").Result)
-                            {
-                                if (response.IsSuccessStatusCode)
-                                {
-                                    var contents = response.Content.ReadAsStringAsync();
-                                    jsonString = contents.Result;
-                                }
-                            }
-                            if (!string.IsNullOrWhiteSpace(jsonString))
-                            {
-                                File.WriteAllText(Path.Combine(filePath + @"json\", fileName), jsonString);
-                            }
+                            File.WriteAllText(Path.Combine(filePath + @"json\", fileName), jsonString);
                         }
                     }
 
@@ -91,20 +98,7 @@ namespace CovidNumbers
         static CaseNumbers GetDailyResults(DateTime date)
         {
             var cases = new CaseNumbers(date);
-            var jsonString = "";
-            using (var client = new HttpClient())
-            {
-                var jsonQuery = $"https://covid19.mathdro.id/api/daily/{date.ToString("MM-dd-yyyy")}";
-                client.BaseAddress = new Uri(jsonQuery);
-                using (var response = client.GetAsync("").Result)
-                {
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var contents = response.Content.ReadAsStringAsync();
-                        jsonString = contents.Result;
-                    }
-                }
-            }
+            var jsonString = GetJsonString($"https://covid19.mathdro.id/api/daily/{date.ToString("MM-dd-yyyy")}");
 
             if (!string.IsNullOrWhiteSpace(jsonString))
             {
@@ -142,20 +136,7 @@ namespace CovidNumbers
         {
             Console.WriteLine("Retrieving World numbers");
             var cases = new CaseNumbers(DateTime.Today);
-            var jsonString = "";
-            using (var client = new HttpClient())
-            {
-                var jsonQuery = "https://covid19.mathdro.id/api";
-                client.BaseAddress = new Uri(jsonQuery);
-                using (var response = client.GetAsync("").Result)
-                {
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var contents = response.Content.ReadAsStringAsync();
-                        jsonString = contents.Result;
-                    }
-                }
-            }
+            var jsonString = GetJsonString("https://covid19.mathdro.id/api");
 
             if (!string.IsNullOrWhiteSpace(jsonString))
             {
@@ -179,21 +160,7 @@ namespace CovidNumbers
         {
             Console.WriteLine($"Retrieving {country}");
             var cases = new CaseNumbers(DateTime.Today);
-
-            var jsonString = "";
-            using (var client = new HttpClient())
-            {
-                var jsonQuery = $"https://covid19.mathdro.id/api/countries/{country}";
-                client.BaseAddress = new Uri(jsonQuery);
-                using (var response = client.GetAsync("").Result)
-                {
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var contents = response.Content.ReadAsStringAsync();
-                        jsonString = contents.Result;
-                    }
-                }
-            }
+            var jsonString = GetJsonString($"https://covid19.mathdro.id/api/countries/{country}");
 
             if (!string.IsNullOrWhiteSpace(jsonString))
             {
@@ -217,21 +184,7 @@ namespace CovidNumbers
         {
             Console.WriteLine($"Retrieving {state}");
             var cases = new CaseNumbers(DateTime.Today);
-
-            var jsonString = "";
-            using (var client = new HttpClient())
-            {
-                var jsonQuery = $"https://api.covidtracking.com/v1/states/{state}/current.json";
-                client.BaseAddress = new Uri(jsonQuery);
-                using (var response = client.GetAsync("").Result)
-                {
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var contents = response.Content.ReadAsStringAsync();
-                        jsonString = contents.Result;
-                    }
-                }
-            }
+            var jsonString = GetJsonString($"https://api.covidtracking.com/v1/states/{state}/current.json");
 
             if (!string.IsNullOrWhiteSpace(jsonString))
             {
@@ -251,7 +204,6 @@ namespace CovidNumbers
                         cases.Hospitalized = jsonData.hospitalizedCurrently;
                         cases.HospitalizedChange = jsonData.hospitalizedIncrease;
                     }
-
                 }
                 catch (Exception ex)
                 {
@@ -264,25 +216,11 @@ namespace CovidNumbers
 
         static CountryData GetCountryList()
         {
-            using (var client = new HttpClient())
+            var jsonString = GetJsonString("https://covid19.mathdro.id/api/countries/");
+            if (!string.IsNullOrWhiteSpace(jsonString))
             {
-                var jsonString = "";
-                var jsonQuery = $"https://covid19.mathdro.id/api/countries/";
-                client.BaseAddress = new Uri(jsonQuery);
-                using (var response = client.GetAsync("").Result)
-                {
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var contents = response.Content.ReadAsStringAsync();
-                        jsonString = contents.Result;
-                    }
-                }
-
-                if (!string.IsNullOrWhiteSpace(jsonString))
-                {
-                    var results = JsonConvert.DeserializeObject<CountryData>(jsonString);
-                    return results;
-                }
+                var results = JsonConvert.DeserializeObject<CountryData>(jsonString);
+                return results;
             }
             return new CountryData();
         }
@@ -311,11 +249,12 @@ namespace CovidNumbers
 
                 foreach (var item in dayList)
                 {
+                    var caseNumbers = new CaseNumbers(i);
+
                     double.TryParse(item.confirmed, out double confirmed);
                     double.TryParse(item.deaths, out double deaths);
                     double.TryParse(item.recovered, out double recovered);
 
-                    var caseNumbers = new CaseNumbers(i);
                     caseNumbers.Confirmed = confirmed;
                     caseNumbers.Deaths = deaths;
                     caseNumbers.Recovered = recovered;
@@ -444,15 +383,14 @@ namespace CovidNumbers
             var txtFile = $"{DateTime.Now.ToString("MMdd")}_TopCountries.txt";
             var lines = new List<string>();
             lines.Add("e[Top 20 Countries]e");
-            lines.Add("");
             foreach (var region in sortedRegions.Take(21))
             {
                 var change = region.Change(checkDate);
 
+                lines.Add("");
                 lines.Add($"b[{region.Name}]b");
                 lines.Add($"Cases: {region.CurrentCases.Confirmed.ToString("N0", CultureInfo.CurrentCulture)} (+{change.Confirmed.ToString("N0", CultureInfo.CurrentCulture)})");
                 lines.Add($"Deaths: {region.CurrentCases.Deaths.ToString("N0", CultureInfo.CurrentCulture)} (+{change.Deaths.ToString("N0", CultureInfo.CurrentCulture)})");
-                lines.Add("");
             }
 
             File.WriteAllLines(Path.Combine(filePath, txtFile), lines);
@@ -476,31 +414,22 @@ namespace CovidNumbers
                         var stateName = $"b[{state.Name}]b s[pop. {state.Population.ToString("N0", CultureInfo.CurrentCulture)}]s";
                         var stateCases = $"Cases: {state.CurrentCases.Confirmed.ToString("N0", CultureInfo.CurrentCulture)} s[{state.CurrentPercentage.Confirmed.ToString("N2", CultureInfo.CurrentCulture)}%]s";
                         var stateDeaths = $"Deaths: {state.CurrentCases.Deaths.ToString("N0", CultureInfo.CurrentCulture)}";
+                        var stateHospitalized = $"Hospitalized: {state.CurrentCases.Hospitalized.ToString("N0", CultureInfo.CurrentCulture)}";
 
                         var change = state.Change(checkDate);
-                        stateCases += (change.Confirmed > 0) ? $" (+{change.Confirmed.ToString("N0", CultureInfo.CurrentCulture)})" : " --";
-                        stateDeaths += (change.Deaths > 0) ? $" (+{change.Deaths.ToString("N0", CultureInfo.CurrentCulture)})" : " --";
+                        stateCases += (change.Confirmed > 0) ? $" (+{change.Confirmed.ToString("N0", CultureInfo.CurrentCulture)})" : " (--)";
+                        stateDeaths += (change.Deaths > 0) ? $" (+{change.Deaths.ToString("N0", CultureInfo.CurrentCulture)})" : " (--)";
+                        stateHospitalized += (state.CurrentCases.HospitalizedChange > 0) ? $" (+{state.CurrentCases.HospitalizedChange.ToString("N0", CultureInfo.CurrentCulture)})" : " (--)";
 
                         lines.Add("");
                         lines.Add(stateName);
                         lines.Add(stateCases);
                         lines.Add(stateDeaths);
-
-                        if (state.CurrentCases.Hospitalized > 0)
-                        {
-                            var stateHospitalized = $"Hospitalized: {state.CurrentCases.Hospitalized.ToString("N0", CultureInfo.CurrentCulture)}";
-                            stateHospitalized += (state.CurrentCases.HospitalizedChange > 0) ? $" (+{state.CurrentCases.HospitalizedChange.ToString("N0", CultureInfo.CurrentCulture)})" : " --";
-                            lines.Add(stateHospitalized);
-                        }
-
+                        lines.Add(stateHospitalized);
                     }
                 }
             }
-            lines.Add("");
-            lines.Add("");
-            lines.Add("");
-            lines.Add("");
-            lines.Add("");
+            lines.Add("\n\n\n\n");
             lines.Add("e[Remaining US States by Gains]e");
             foreach (var state in sortedStates.Skip(15))
             {
@@ -512,22 +441,18 @@ namespace CovidNumbers
                         var stateName = $"b[{state.Name}]b s[pop. {state.Population.ToString("N0", CultureInfo.CurrentCulture)}]s";
                         var stateCases = $"Cases: {state.CurrentCases.Confirmed.ToString("N0", CultureInfo.CurrentCulture)} s[{state.CurrentPercentage.Confirmed.ToString("N2", CultureInfo.CurrentCulture)}%]s";
                         var stateDeaths = $"Deaths: {state.CurrentCases.Deaths.ToString("N0", CultureInfo.CurrentCulture)}";
+                        var stateHospitalized = $"Hospitalized: {state.CurrentCases.Hospitalized.ToString("N0", CultureInfo.CurrentCulture)}";
 
                         var change = state.Change(checkDate);
                         stateCases += (change.Confirmed > 0) ? $" (+{change.Confirmed.ToString("N0", CultureInfo.CurrentCulture)})" : " --";
                         stateDeaths += (change.Deaths > 0) ? $" (+{change.Deaths.ToString("N0", CultureInfo.CurrentCulture)})" : " --";
-                      
+                        stateHospitalized += (state.CurrentCases.HospitalizedChange > 0) ? $" (+{state.CurrentCases.HospitalizedChange.ToString("N0", CultureInfo.CurrentCulture)})" : " --";
+
                         lines.Add("");
                         lines.Add(stateName);
                         lines.Add(stateCases);
                         lines.Add(stateDeaths);
-
-                        if (state.CurrentCases.Hospitalized > 0)
-                        {
-                            var stateHospitalized = $"Hospitalized: {state.CurrentCases.Hospitalized.ToString("N0", CultureInfo.CurrentCulture)}";
-                            stateHospitalized += (state.CurrentCases.HospitalizedChange > 0) ? $" (+{state.CurrentCases.HospitalizedChange.ToString("N0", CultureInfo.CurrentCulture)})" : " --";
-                            lines.Add(stateHospitalized);
-                        }
+                        lines.Add(stateHospitalized);
                     }
                 }
             }
@@ -538,7 +463,7 @@ namespace CovidNumbers
         private static void WriteStateResults(Region region, string stateAbbr)
         {
             var state = region.States.SingleOrDefault(s => s.Abbr == stateAbbr);
-            var txtFile = $"{DateTime.Now.ToString("MMdd")}_SDcsv.txt";
+            var txtFile = $"{DateTime.Now.ToString("MMdd")}_{stateAbbr}_csv.txt";
             var lines = new List<string>();
             foreach (var item in state.Cases)
             {
