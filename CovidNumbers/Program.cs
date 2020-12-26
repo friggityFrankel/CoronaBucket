@@ -22,7 +22,7 @@ namespace CovidNumbers
 
             //WriteStateResults(sortedResults.SingleOrDefault(r => r.Name == "US"), "SD");
 
-            WriteWorldResults();
+            WriteWorldResults(sortedResults.SingleOrDefault(r => r.Name == "US"));
             WriteCountryResults(sortedResults);
             WriteUSResults(sortedResults.SingleOrDefault(r => r.Name == "US"));
 
@@ -357,14 +357,21 @@ namespace CovidNumbers
             Console.WriteLine("Write to world file successful");
         }
 
-        private static void WriteWorldResults()
+        private static void WriteWorldResults(Region usRegion)
         {
+            var eventTitle = "We Have a Real President with a Plan";
+            var eventDate = new DateTime(2021, 1, 20);
+            var previousURL = "https://www.shacknews.com/chatty?id=40269408";
+
             var checkDate = DateTime.Today.AddDays(-2);
             var txtFile = $"{DateTime.Now.ToString("MMdd")}_World.txt";
             var lines = new List<string>();
             var current = GetCurrentWorld();
             var change = GetDailyResults(checkDate);
+            var usChange = usRegion.Change(DateTime.Today.AddDays(-1));
 
+            lines.Add($"*[b{{Corona Bucket}}b]*: {(eventDate - DateTime.Today).Days} Days Till {eventTitle}");
+            lines.Add("");
             lines.Add("b{World Wide}b totals:");
             lines.Add($"y{{Cases}}y: {current.Confirmed.ToString("N0", CultureInfo.CurrentCulture)} (+{(current.Confirmed - change.Confirmed).ToString("N0", CultureInfo.CurrentCulture)})");
             lines.Add($"r{{Deaths}}r: {current.Deaths.ToString("N0", CultureInfo.CurrentCulture)} (+{(current.Deaths - change.Deaths).ToString("N0", CultureInfo.CurrentCulture)})");
@@ -372,6 +379,21 @@ namespace CovidNumbers
             lines.Add($"p[Unresolved]p: {current.Unresolved.ToString("N0", CultureInfo.CurrentCulture)} (+{(current.Unresolved - change.Unresolved).ToString("N0", CultureInfo.CurrentCulture)})");
             lines.Add("");
             lines.Add("r{U}rb[S]bb{A}b totals:");
+            lines.Add($"Cases: {usRegion.CurrentCases.Confirmed.ToString("N0", CultureInfo.CurrentCulture)} (+{usChange.Confirmed.ToString("N0", CultureInfo.CurrentCulture)})");
+            lines.Add($"Deaths: {usRegion.CurrentCases.Deaths.ToString("N0", CultureInfo.CurrentCulture)} (+{usChange.Deaths.ToString("N0", CultureInfo.CurrentCulture)})");
+            lines.Add("");
+            lines.Add("Johns Hopkins University COVID-19 Dashboard");
+            lines.Add("https://gisanddata.maps.arcgis.com/apps/opsdashboard/index.html#/bda7594740fd40299423467b48e9ecf6");
+            lines.Add("");
+            lines.Add("NYTimes US Hotspot Tracker");
+            lines.Add("https://www.nytimes.com/interactive/2020/us/coronavirus-us-cases.html?#hotspots");
+            lines.Add("");
+            lines.Add("Folding @Home");
+            lines.Add("https://foldingathome.org/");
+            lines.Add("Join the Shacknews Folding@Home team to help fight COVID-19 https://apps.foldingathome.org/teamstats/team50784.html");
+            lines.Add("");
+            lines.Add($"#COVID19{DateTime.Now.ToString("yyyyMMdd")}");
+            lines.Add($"Previously in the bucket: {previousURL}");
 
             File.WriteAllLines(Path.Combine(filePath, txtFile), lines);
         }
@@ -379,7 +401,7 @@ namespace CovidNumbers
         private static void WriteCountryResults(List<Region> regions)
         {
             var checkDate = DateTime.Today.AddDays(-1);
-            var sortedRegions = regions.OrderByDescending(r => r.Change(checkDate).Confirmed);
+            var sortedRegions = regions.Where(r => r.Name != "US").OrderByDescending(r => r.Change(checkDate).Confirmed);
             var txtFile = $"{DateTime.Now.ToString("MMdd")}_TopCountries.txt";
             var lines = new List<string>();
             lines.Add("e[Top 20 Countries]e");
@@ -444,9 +466,9 @@ namespace CovidNumbers
                         var stateHospitalized = $"Hospitalized: {state.CurrentCases.Hospitalized.ToString("N0", CultureInfo.CurrentCulture)}";
 
                         var change = state.Change(checkDate);
-                        stateCases += (change.Confirmed > 0) ? $" (+{change.Confirmed.ToString("N0", CultureInfo.CurrentCulture)})" : " --";
-                        stateDeaths += (change.Deaths > 0) ? $" (+{change.Deaths.ToString("N0", CultureInfo.CurrentCulture)})" : " --";
-                        stateHospitalized += (state.CurrentCases.HospitalizedChange > 0) ? $" (+{state.CurrentCases.HospitalizedChange.ToString("N0", CultureInfo.CurrentCulture)})" : " --";
+                        stateCases += (change.Confirmed > 0) ? $" (+{change.Confirmed.ToString("N0", CultureInfo.CurrentCulture)})" : " (--)";
+                        stateDeaths += (change.Deaths > 0) ? $" (+{change.Deaths.ToString("N0", CultureInfo.CurrentCulture)})" : " (--)";
+                        stateHospitalized += (state.CurrentCases.HospitalizedChange > 0) ? $" (+{state.CurrentCases.HospitalizedChange.ToString("N0", CultureInfo.CurrentCulture)})" : " (--)";
 
                         lines.Add("");
                         lines.Add(stateName);
