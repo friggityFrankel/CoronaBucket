@@ -407,12 +407,20 @@ namespace CovidNumbers
             lines.Add("e[Top 20 Countries]e");
             foreach (var region in sortedRegions.Take(21))
             {
+                var confirmed = region.CurrentCases.Confirmed;
+                var deaths = region.CurrentCases.Deaths;
+                if (confirmed == 0 && deaths == 0)
+                {
+                    confirmed = region.Cases(checkDate).Confirmed;
+                    deaths = region.Cases(checkDate).Deaths;
+                }
+
                 var change = region.Change(checkDate);
 
                 lines.Add("");
                 lines.Add($"b[{region.Name}]b");
-                lines.Add($"Cases: {region.CurrentCases.Confirmed.ToString("N0", CultureInfo.CurrentCulture)} (+{change.Confirmed.ToString("N0", CultureInfo.CurrentCulture)})");
-                lines.Add($"Deaths: {region.CurrentCases.Deaths.ToString("N0", CultureInfo.CurrentCulture)} (+{change.Deaths.ToString("N0", CultureInfo.CurrentCulture)})");
+                lines.Add($"Cases: {confirmed.ToString("N0", CultureInfo.CurrentCulture)} (+{change.Confirmed.ToString("N0", CultureInfo.CurrentCulture)})");
+                lines.Add($"Deaths: {deaths.ToString("N0", CultureInfo.CurrentCulture)} (+{change.Deaths.ToString("N0", CultureInfo.CurrentCulture)})");
             }
 
             File.WriteAllLines(Path.Combine(filePath, txtFile), lines);
