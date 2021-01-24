@@ -20,7 +20,7 @@ namespace ClassLibrary
         public object inIcuCumulative { get; set; }
         public object onVentilatorCurrently { get; set; }
         public object onVentilatorCumulative { get; set; }
-        public object recovered { get; set; }
+        public int recovered { get; set; }
         public string dataQualityGrade { get; set; }
         public string lastUpdateEt { get; set; }
         public DateTime dateModified { get; set; }

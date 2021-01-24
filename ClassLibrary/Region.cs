@@ -8,8 +8,12 @@ namespace ClassLibrary
     {
         public string Name;
         public string Iso2;
+        public string Iso3;
         public List<State> States;
         public CaseNumbers CurrentCases;
+        public int TotalVaccinations;
+        public int DailyVaccionations;
+        public int FullyVaccinated;
 
         public Region(string name)
         {
@@ -47,21 +51,6 @@ namespace ClassLibrary
                 change.Confirmed = c1.Confirmed - c2.Confirmed;
                 change.Deaths = c1.Deaths - c2.Deaths;
                 change.Recovered = c1.Recovered - c2.Recovered;
-            }
-
-            return change;
-        }
-
-        public CaseNumbers ChangeSince(DateTime date)
-        {
-            CaseNumbers change = new CaseNumbers(DateTime.Today);
-            CaseNumbers previousCases = Cases(date);
-
-            if (CurrentCases != null && previousCases != null)
-            {
-                change.Confirmed = CurrentCases.Confirmed - previousCases.Confirmed;
-                change.Deaths = CurrentCases.Deaths - previousCases.Deaths;
-                change.Recovered = CurrentCases.Recovered - previousCases.Recovered;
             }
 
             return change;
