@@ -10,15 +10,18 @@ namespace ClassLibrary
         public string Iso2;
         public string Iso3;
         public List<State> States;
+        public List<VaccinationNumbers> Vaccinations;
         public CaseNumbers CurrentCases;
-        public int TotalVaccinations;
-        public int DailyVaccionations;
-        public int FullyVaccinated;
+        public double Population;
+        //public double TotalVaccinations;
+        //public double DailyVaccionations;
+        //public double FullyVaccinated;
 
         public Region(string name)
         {
             Name = name;
             States = new List<State>();
+            Vaccinations = new List<VaccinationNumbers>();
             CurrentCases = new CaseNumbers(DateTime.Today);
         }
 
@@ -54,6 +57,45 @@ namespace ClassLibrary
             }
 
             return change;
+        }
+
+        public VaccinationNumbers VaccineChange()
+        {
+            var c1 = Vaccinations.OrderByDescending(v => v.Date).FirstOrDefault();
+            var change = new VaccinationNumbers(c1.Date);
+
+            if (c1 != null)
+            {
+                change.Total = c1.Total;
+                change.Fully = c1.Fully;
+            }
+
+            var c2 = Vaccinations.OrderByDescending(v => v.Date).Skip(1).FirstOrDefault();
+
+            if (c2 != null)
+            {
+                change.Total -= c2.Total;
+                change.Fully -= c2.Fully;
+            }
+
+            return change;
+        }
+
+        public VaccinationNumbers VaccinePercentage()
+        {
+            var percentages = new VaccinationNumbers(DateTime.Today);
+
+            if (Population > 0)
+            {
+                var vacs = Vaccinations.OrderByDescending(v => v.Date).FirstOrDefault();
+                if (vacs != null)
+                {
+                    percentages.Total = vacs.Total * 100.0 / Population;
+                    percentages.Fully = vacs.Fully * 100.0 / Population;
+                }
+            }
+
+            return percentages;
         }
     }
 }

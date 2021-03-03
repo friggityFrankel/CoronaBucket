@@ -11,12 +11,14 @@ namespace ClassLibrary
         public int Population;
         public CaseNumbers CurrentCases;
         public List<CaseNumbers> Cases;
+        public List<VaccinationNumbers> Vaccinations;
 
         public State(string name)
         {
             Name = name;
             CurrentCases = new CaseNumbers(DateTime.Today);
             Cases = new List<CaseNumbers>();
+            Vaccinations = new List<VaccinationNumbers>();
         }
 
         public CaseNumbers Change(DateTime date)
@@ -62,6 +64,49 @@ namespace ClassLibrary
                 }
                 return percentages;
             }
+        }
+
+        public VaccinationNumbers VaccineChange()
+        {
+            var c1 = Vaccinations.OrderByDescending(v => v.Date).FirstOrDefault();
+            if (c1 == null)
+            {
+                return new VaccinationNumbers(DateTime.Now);
+            }
+            var change = new VaccinationNumbers(c1.Date);
+
+            if (c1 != null)
+            {
+                change.Total = c1.Total;
+                change.Fully = c1.Fully;
+            }
+
+            var c2 = Vaccinations.OrderByDescending(v => v.Date).Skip(1).FirstOrDefault();
+
+            if (c2 != null)
+            {
+                change.Total -= c2.Total;
+                change.Fully -= c2.Fully;
+            }
+
+            return change;
+        }
+
+        public VaccinationNumbers VaccinePercentage()
+        {
+            var percentages = new VaccinationNumbers(DateTime.Today);
+
+            if (Population > 0)
+            {
+                var vacs = Vaccinations.OrderByDescending(v => v.Date).FirstOrDefault();
+                if (vacs != null)
+                {
+                    percentages.Total = vacs.Total * 100.0 / Population;
+                    percentages.Fully = vacs.Fully * 100.0 / Population;
+                }
+            }
+
+            return percentages;
         }
     }
 }
