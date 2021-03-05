@@ -21,6 +21,44 @@ namespace ClassLibrary
             Vaccinations = new List<VaccinationNumbers>();
         }
 
+        public CaseNumbers TrendingCases()
+        {
+            var trend = new CaseNumbers(DateTime.Today);
+            var count = (Cases.Count >= 7) ? 7 : Cases.Count;
+
+            foreach (var item in Cases.OrderByDescending(c => c.Date).Take(count))
+            {
+                trend.Confirmed += item.Confirmed;
+                trend.Deaths += item.Deaths;
+                trend.Recovered += item.Recovered;
+            }
+
+            trend.Confirmed /= count;
+            trend.Deaths /= count;
+            trend.Recovered /= count;
+
+            return trend;
+        }
+
+        public VaccinationNumbers TrendingVaccines()
+        {
+            var trend = new VaccinationNumbers(DateTime.Today);
+            var count = (Vaccinations.Count >= 7) ? 7 : Vaccinations.Count;
+
+            foreach (var item in Vaccinations.OrderByDescending(v =>v.Date).Take(count))
+            {
+                trend.Total += item.Total;
+                trend.Daily += item.Daily;
+                trend.Fully += item.Fully;
+            }
+
+            trend.Total /= count;
+            trend.Daily /= count;
+            trend.Fully /= count;
+
+            return trend;
+        }
+
         public CaseNumbers Change(DateTime date)
         {
             CaseNumbers change = new CaseNumbers(date);

@@ -12,7 +12,7 @@ namespace CovidNumbers
     class Program
     {
         //static DateTime startDate = new DateTime(2020, 1, 22);
-        static DateTime startDate = DateTime.Today.AddDays(-3);
+        static DateTime startDate = DateTime.Today.AddDays(-7);
         static string filePath = @"D:\temp\";
 
         static void Main(string[] args)
@@ -108,6 +108,7 @@ namespace CovidNumbers
 
         static CaseNumbers GetDailyResults(DateTime date)
         {
+            Console.WriteLine($"GetDailyResults: {date}");
             var cases = new CaseNumbers(date);
             var jsonString = GetJsonString($"https://covid19.mathdro.id/api/daily/{date.ToString("MM-dd-yyyy")}");
 
@@ -145,7 +146,7 @@ namespace CovidNumbers
 
         static CaseNumbers GetCurrentWorld()
         {
-            Console.WriteLine("Retrieving World numbers...");
+            Console.WriteLine("Get Current World...");
             var cases = new CaseNumbers(DateTime.Today);
             var jsonString = GetJsonString("https://covid19.mathdro.id/api");
 
@@ -169,6 +170,7 @@ namespace CovidNumbers
 
         static CaseNumbers GetCurrentCountry(string country)
         {
+            Console.WriteLine($"Get Current Country: {country}");
             var cases = new CaseNumbers(DateTime.Today);
             var jsonString = GetJsonString($"https://covid19.mathdro.id/api/countries/{country}");
 
@@ -192,6 +194,7 @@ namespace CovidNumbers
 
         static CaseNumbers GetCurrentState(string state)
         {
+            Console.WriteLine($"Get Current State: {state}");
             var cases = new CaseNumbers(DateTime.Today);
             var jsonString = GetJsonString($"https://api.covidtracking.com/v1/states/{state}/current.json");
 
@@ -227,7 +230,7 @@ namespace CovidNumbers
         static List<VaccinationData> GetVaccinations()
         {
             //https://raw.githubusercontent.com/owid/covid-19-data/master/public/data/vaccinations/vaccinations.csv
-            Console.WriteLine($"Retrieving Vaccine Data...");
+            Console.WriteLine($"Get Vaccinations...");
             var vacList = new List<VaccinationData>();
             var jsonString = GetJsonString(@"https://raw.githubusercontent.com/owid/covid-19-data/master/public/data/vaccinations/vaccinations.csv");
 
@@ -262,6 +265,7 @@ namespace CovidNumbers
 
         static List<VaccinationData> GetUSVaccinations()
         {
+            Console.WriteLine("Get US Vaccinations...");
             var vacList = new List<VaccinationData>();
             var jsonString = GetJsonString(@"https://raw.githubusercontent.com/owid/covid-19-data/master/public/data/vaccinations/us_state_vaccinations.csv");
 
@@ -304,6 +308,7 @@ namespace CovidNumbers
 
         static CountryData GetCountryList()
         {
+            Console.WriteLine("Get Country List");
             var jsonString = GetJsonString("https://covid19.mathdro.id/api/countries/");
             if (!string.IsNullOrWhiteSpace(jsonString))
             {
@@ -360,13 +365,6 @@ namespace CovidNumbers
                             region.CurrentCases = GetCurrentCountry(region.Iso2);
                         }
 
-                        //region.Iso2 = countryList.countries.SingleOrDefault(c => c.name == region.Name)?.iso2;
-                        //region.Iso3 = countryList.countries.SingleOrDefault(c => c.name == region.Name)?.iso3;
-                        //if (region.Iso2 != null)
-                        //{
-                        //    region.CurrentCases = GetCurrentCountry(region.Iso2);
-                        //}
-
                         foreach (var vac in vacsList.Where(v => v.iso_code == region.Iso3))
                         {
                             var vaccineNumber = new VaccinationNumbers(vac.date);
@@ -378,13 +376,13 @@ namespace CovidNumbers
 
                         if (region.Vaccinations.Count == 0)
                         {
-                            region.Vaccinations.Add(new VaccinationNumbers(DateTime.Today));
+                            region.Vaccinations.Add(new VaccinationNumbers(DateTime.Today.AddDays(-1)));
                         }
 
-                        if (region.Vaccinations.Where(v => v.Date == DateTime.Today) == null)
+                        if (region.Vaccinations.SingleOrDefault(v => v.Date == DateTime.Today.AddDays(-1)) == null)
                         {
                             var previousVac = region.Vaccinations.OrderByDescending(v => v.Date).First();
-                            var newVac = new VaccinationNumbers(DateTime.Today);
+                            var newVac = new VaccinationNumbers(DateTime.Today.AddDays(-1));
                             newVac.Total = previousVac.Total;
                             newVac.Fully = previousVac.Fully;
                             region.Vaccinations.Add(newVac);
@@ -609,13 +607,6 @@ namespace CovidNumbers
         private static void WriteUSResults(Region states)
         {
             var checkDate = DateTime.Today.AddDays(-1);
-            //foreach (var item in states.States)
-            //{
-            //    if (item.Vaccinations.Count == 0)
-            //    {
-            //        item.Vaccinations.Add(new VaccinationNumbers(checkDate));
-            //    }
-            //}
             var sortedStates = states.States.OrderByDescending(s => s.Vaccinations.OrderByDescending(v => v.Date).FirstOrDefault().Daily);
             //var sortedStates = states.States.OrderByDescending(s => s.CurrentPercentage.Confirmed);
             var txtFile = $"{DateTime.Today.ToString("MMdd")}_TopStates.txt";
