@@ -116,6 +116,7 @@ namespace ClassLibrary
             if (c1 != null)
             {
                 change.Total = c1.Total;
+                change.Partial = c1.Partial;
                 change.Fully = c1.Fully;
             }
 
@@ -124,6 +125,7 @@ namespace ClassLibrary
             if (c2 != null)
             {
                 change.Total -= c2.Total;
+                change.Partial -= c2.Partial;
                 change.Fully -= c2.Fully;
             }
 
@@ -140,6 +142,7 @@ namespace ClassLibrary
                 if (vacs != null)
                 {
                     percentages.Total = vacs.Total * 100.0 / Population;
+                    percentages.Partial = vacs.Partial * 100.0 / Population;
                     percentages.Fully = vacs.Fully * 100.0 / Population;
                 }
             }

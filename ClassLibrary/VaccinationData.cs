@@ -8,14 +8,14 @@ namespace ClassLibrary
         public string location;
         public string iso_code;
         public DateTime date;
-        public int total_vaccinations;
-        public int total_vaccinations_per_hundred;
-        public int daily_vaccinations_raw;
-        public int daily_vaccinations;
-        public int daily_vaccinations_per_million;
-        public int people_vaccinated;
-        public int people_vaccinated_per_hundred;
-        public int people_fully_vaccinated;
-        public int people_fully_vaccinated_per_hundred;
+        public double total_vaccinations;
+        public double total_vaccinations_per_hundred;
+        public double daily_vaccinations_raw;
+        public double daily_vaccinations;
+        public double daily_vaccinations_per_million;
+        public double people_vaccinated;
+        public double people_vaccinated_per_hundred;
+        public double people_fully_vaccinated;
+        public double people_fully_vaccinated_per_hundred;
     }
 }
