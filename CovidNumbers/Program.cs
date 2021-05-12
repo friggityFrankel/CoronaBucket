@@ -20,6 +20,7 @@ namespace CovidNumbers
             var results = GetResults();
             var vacsList = GetVaccinations();
             var vacsUSList = GetUSVaccinations();
+           
             var sortedResults = SortResults(results, vacsList, vacsUSList);
 
             WriteWorldResults(sortedResults.SingleOrDefault(r => r.Name == "US"), vacsList.Where(v => v.iso_code == "OWID_WRL").ToList());
@@ -332,11 +333,30 @@ namespace CovidNumbers
             return new StateData();
         }
 
+        private static List<Populations> GetPopulations()
+        {
+            var pops = new List<Populations>();
+            var populations = File.ReadAllLines(filePath + "Populations.txt");
+            foreach (var item in populations)
+            {
+                var info = item.Split(' ');
+                var newPop = new Populations
+                {
+                    Iso3 = info[0],
+                    Population = double.Parse(info[1])
+                };
+                pops.Add(newPop);
+            }
+
+            return pops;
+        }
+
         private static List<Region> SortResults(List<ResultData> resultData, List<VaccinationData> vacsList, List<VaccinationData> vacsUSList)
         {
             var regionList = new List<Region>();
             var countryList = GetCountryList();
             var stateList = GetStateList();
+            var populationList = GetPopulations();
 
             for (var i = startDate; i < DateTime.Today; i = i.AddDays(1))
             {
@@ -360,11 +380,17 @@ namespace CovidNumbers
                     {
                         region = new Region(item.countryRegion);
                         var countryInfo = countryList.countries.SingleOrDefault(c => c.name == region.Name);
+
                         if (countryInfo != null)
                         {
                             region.Iso2 = countryInfo.iso2;
                             region.Iso3 = countryInfo.iso3;
                             region.CurrentCases = GetCurrentCountry(region.Iso2);
+                            if (region.Iso3 != null && populationList.SingleOrDefault(c => c.Iso3 == region.Iso3) != null)
+                            {
+                                region.Population = populationList.SingleOrDefault(c => c.Iso3 == region.Iso3).Population;
+                            }
+                            
                         }
 
                         foreach (var vac in vacsList.Where(v => v.iso_code == region.Iso3))
@@ -590,12 +616,13 @@ namespace CovidNumbers
             var sortedRegions = regions.Where(r => r.Name != "US").OrderByDescending(r => r.VaccineChange().Total);
             var txtFile = $"{DateTime.Today.ToString("MMdd")}_TopCountries.txt";
             var lines = new List<string>();
-            lines.Add("e[Top 20 Countries by Total Daily Vaccinations]e");
-            foreach (var region in sortedRegions.Take(21))
+            lines.Add("e[Top 15 Countries by Total Daily Vaccinations]e");
+            foreach (var region in sortedRegions.Take(15))
             {
                 var confirmed = region.CurrentCases.Confirmed;
                 var deaths = region.CurrentCases.Deaths;
                 var vaccinations = region.Vaccinations.OrderByDescending(v => v.Date).FirstOrDefault();
+
                 if (confirmed == 0 && deaths == 0)
                 {
                     confirmed = region.Cases(checkDate).Confirmed;
@@ -604,15 +631,15 @@ namespace CovidNumbers
 
                 var change = region.Change(checkDate);
 
-                var countryName = $"b[{region.Name}]b";
+                var countryNameAndPopulation = $"b[{region.Name}]b s[pop. {region.Population.ToString("N0", CultureInfo.CurrentCulture)}]s";
                 var countryVaccines = $"• Total Doses Administered: {vaccinations.Total.ToString("N0", CultureInfo.CurrentCulture)} (+{region.VaccineChange().Total.ToString("N0", CultureInfo.CurrentCulture)})";
-                var countryPartialVaccinated = $"• At Least 1st Dose: {vaccinations.Partial.ToString("N0", CultureInfo.CurrentCulture)} (+{region.VaccineChange().Partial.ToString("N0", CultureInfo.CurrentCulture)})";
-                var countryFullyVaccinated = $"• Fully Vaccinated: {vaccinations.Fully.ToString("N0", CultureInfo.CurrentCulture)} (+{region.VaccineChange().Fully.ToString("N0", CultureInfo.CurrentCulture)})";
+                var countryPartialVaccinated = $"• At Least 1st Dose: {vaccinations.Partial.ToString("N0", CultureInfo.CurrentCulture)} s[{region.VaccinePercentage().Partial.ToString("N2", CultureInfo.CurrentCulture)}%]s (+{region.VaccineChange().Partial.ToString("N0", CultureInfo.CurrentCulture)})";
+                var countryFullyVaccinated = $"• Fully Vaccinated: {vaccinations.Fully.ToString("N0", CultureInfo.CurrentCulture)} s[{region.VaccinePercentage().Fully.ToString("N2", CultureInfo.CurrentCulture)}%]s (+{region.VaccineChange().Fully.ToString("N0", CultureInfo.CurrentCulture)})";
                 var countryCases = $"• Cases: {confirmed.ToString("N0", CultureInfo.CurrentCulture)} (+{change.Confirmed.ToString("N0", CultureInfo.CurrentCulture)})";
                 var countryDeaths = $"• Deaths: {deaths.ToString("N0", CultureInfo.CurrentCulture)} (+{change.Deaths.ToString("N0", CultureInfo.CurrentCulture)})";
-                
+
                 lines.Add("");
-                lines.Add(countryName);
+                lines.Add(countryNameAndPopulation);
                 lines.Add(countryVaccines);
                 lines.Add(countryPartialVaccinated);
                 lines.Add(countryFullyVaccinated);
