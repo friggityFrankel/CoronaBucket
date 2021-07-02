@@ -23,19 +23,14 @@ namespace ClassLibrary
 
         public CaseNumbers TrendingCases()
         {
+
             var trend = new CaseNumbers(DateTime.Today);
             var count = (Cases.Count >= 7) ? 7 : Cases.Count;
+            var cases = Cases.OrderByDescending(x => x.Date).Take(count);
 
-            foreach (var item in Cases.OrderByDescending(c => c.Date).Take(count))
-            {
-                trend.Confirmed += item.Confirmed;
-                trend.Deaths += item.Deaths;
-                trend.Recovered += item.Recovered;
-            }
-
-            trend.Confirmed /= count;
-            trend.Deaths /= count;
-            trend.Recovered /= count;
+            trend.Confirmed = cases.Average(x => x.Confirmed);
+            trend.Deaths = cases.Average(x => x.Deaths);
+            trend.Recovered = cases.Average(x => x.Recovered);
 
             return trend;
         }
@@ -44,17 +39,11 @@ namespace ClassLibrary
         {
             var trend = new VaccinationNumbers(DateTime.Today);
             var count = (Vaccinations.Count >= 7) ? 7 : Vaccinations.Count;
+            var vaccs = Vaccinations.OrderByDescending(v => v.Date).Take(count);
 
-            foreach (var item in Vaccinations.OrderByDescending(v =>v.Date).Take(count))
-            {
-                trend.Total += item.Total;
-                trend.Daily += item.Daily;
-                trend.Fully += item.Fully;
-            }
-
-            trend.Total /= count;
-            trend.Daily /= count;
-            trend.Fully /= count;
+            trend.Total = vaccs.Average(x => x.Total);
+            trend.Daily = vaccs.Average(x => x.Daily);
+            trend.Fully = vaccs.Average(x => x.Fully);
 
             return trend;
         }

@@ -582,7 +582,7 @@ namespace CovidNumbers
             lines.Add($"p[Unresolved]p: {current.Unresolved.ToString("N0", CultureInfo.CurrentCulture)} (+{(current.Unresolved - change.Unresolved).ToString("N0", CultureInfo.CurrentCulture)})");
             lines.Add("");
             lines.Add($"r{{U}}rb[S]bb{{A}}b s[pop. {usRegion.Population.ToString("N0", CultureInfo.CurrentCulture)}]s totals:");
-            lines.Add($"*[Total Doses]*: {usVaccine.Total.ToString("N0", CultureInfo.CurrentCulture)} (+{usRegion.VaccineChange().Total.ToString("N0", CultureInfo.CurrentCulture)})");
+            lines.Add($"*[Total Doses]*: {usVaccine.Total.ToString("N0", CultureInfo.CurrentCulture)} (+{usRegion.VaccineChange().Total.ToString("N0", CultureInfo.CurrentCulture)} | {usRegion})");
             lines.Add($"*[At Least 1st Dose]*: {usVaccine.Partial.ToString("N0", CultureInfo.CurrentCulture)} s[{(usVaccinePercents.Partial).ToString("N2", CultureInfo.CurrentCulture)}%]s (+{usRegion.VaccineChange().Partial.ToString("N0", CultureInfo.CurrentCulture)})");
             lines.Add($"*[Fully Vaccinated]*: {usVaccine.Fully.ToString("N0", CultureInfo.CurrentCulture)} s[{(usVaccinePercents.Fully).ToString("N2", CultureInfo.CurrentCulture)}%]s (+{usRegion.VaccineChange().Fully.ToString("N0", CultureInfo.CurrentCulture)})");
             lines.Add($"Cases: {usRegion.CurrentCases.Confirmed.ToString("N0", CultureInfo.CurrentCulture)} (+{usChange.Confirmed.ToString("N0", CultureInfo.CurrentCulture)})");
@@ -613,10 +613,10 @@ namespace CovidNumbers
         {
             var checkDate = DateTime.Today.AddDays(-1);
             //var sortedRegions = regions.Where(r => r.Name != "US").OrderByDescending(r => r.Change(checkDate).Confirmed);
-            var sortedRegions = regions.Where(r => r.Name != "US").OrderByDescending(r => r.VaccineChange().Total);
+            var sortedRegions = regions.Where(r => r.Name != "US").OrderByDescending(r => r.VaccinePercentage().Fully);
             var txtFile = $"{DateTime.Today.ToString("MMdd")}_TopCountries.txt";
             var lines = new List<string>();
-            lines.Add("e[Top 15 Countries by Total Daily Vaccinations]e");
+            lines.Add("e[Top 15 Countries by Population Fully Vaccinated]e");
             foreach (var region in sortedRegions.Take(15))
             {
                 var confirmed = region.CurrentCases.Confirmed;
@@ -656,10 +656,11 @@ namespace CovidNumbers
         private static void WriteUSResults(Region states)
         {
             var checkDate = DateTime.Today.AddDays(-1);
-            var sortedStates = states.States.OrderByDescending(s => s.Vaccinations.OrderByDescending(v => v.Date).FirstOrDefault().Daily);
+            var sortedStates = states.States.OrderByDescending(r => r.VaccinePercentage().Fully);
+            //var sortedStates = states.States.OrderByDescending(s => s.Vaccinations.OrderByDescending(v => v.Date).FirstOrDefault().Daily);
             var txtFile = $"{DateTime.Today.ToString("MMdd")}_TopStates.txt";
             var lines = new List<string>();
-            lines.Add("e[Top 15 US States by Total Daily Vaccinations]e");
+            lines.Add("e[Top 15 US States by Population Fully Vaccinated]e");
             foreach (var state in sortedStates.Take(15))
             {
                 if (state.CurrentCases.Confirmed > 0)
@@ -691,9 +692,9 @@ namespace CovidNumbers
                 }
             }
             lines.Add("\n\n\n\n");
-            lines.Add("e[Remaining US States by Total Daily Vaccinations]e");
+            lines.Add("e[Remaining US States Alphabetically]e");
             var i = 0;
-            foreach (var state in sortedStates.Skip(15).Where(s => s.Population > 170000))
+            foreach (var state in sortedStates.Skip(15).Where(s => s.Population > 170000).OrderBy(s => s.Name))
             {
                 if (state.CurrentCases.Confirmed > 0)
                 {
