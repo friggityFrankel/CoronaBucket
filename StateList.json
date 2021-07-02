@@ -1,0 +1,381 @@
+{
+  "states": [
+  {
+    "State": "Alabama",
+    "Abbrev": "Ala.",
+    "Code": "AL",
+    "Population": 4903185,
+    "Voted": "Red"
+  },
+  {
+    "State": "Alaska",
+    "Abbrev": "Alaska",
+    "Code": "AK",
+    "Population": 731545,
+    "Voted": "Red"
+  },
+  {
+    "State": "Arizona",
+    "Abbrev": "Ariz.",
+    "Code": "AZ",
+    "Population": 7278717,
+    "Voted": "Blue"
+  },
+  {
+    "State": "Arkansas",
+    "Abbrev": "Ark.",
+    "Code": "AR",
+    "Population": 3017825,
+    "Voted": "Red"
+  },
+  {
+    "State": "California",
+    "Abbrev": "Calif.",
+    "Code": "CA",
+    "Population": 39512223,
+    "Voted": "Blue"
+  },
+  {
+    "State": "Colorado",
+    "Abbrev": "Colo.",
+    "Code": "CO",
+    "Population": 5758736,
+    "Voted": "Blue"
+  },
+  {
+    "State": "Connecticut",
+    "Abbrev": "Conn.",
+    "Code": "CT",
+    "Population": 3565287,
+    "Voted": "Blue"
+  },
+  {
+    "State": "Delaware",
+    "Abbrev": "Del.",
+    "Code": "DE",
+    "Population": 973764,
+    "Voted": "Blue"
+  },
+  {
+    "State": "District of Columbia",
+    "Abbrev": "D.C.",
+    "Code": "DC",
+    "Population": 705749,
+    "Voted": "Blue"
+  },
+  {
+    "State": "Florida",
+    "Abbrev": "Fla.",
+    "Code": "FL",
+    "Population": 21477737,
+    "Voted": "Red"
+  },
+  {
+    "State": "Georgia",
+    "Abbrev": "Ga.",
+    "Code": "GA",
+    "Population": 10617423,
+    "Voted": "Blue"
+  },
+  {
+    "State": "Guam",
+    "Abbrev": "Gua.",
+    "Code": "GU",
+    "Population": 165718,
+    "Voted": "None"
+  },
+  {
+    "State": "Hawaii",
+    "Abbrev": "Hawaii",
+    "Code": "HI",
+    "Population": 1415872,
+    "Voted": "Blue"
+  },
+  {
+    "State": "Idaho",
+    "Abbrev": "Idaho",
+    "Code": "ID",
+    "Population": 1787065,
+    "Voted": "Red"
+  },
+  {
+    "State": "Illinois",
+    "Abbrev": "Ill.",
+    "Code": "IL",
+    "Population": 12671821,
+    "Voted": "Blue"
+  },
+  {
+    "State": "Indiana",
+    "Abbrev": "Ind.",
+    "Code": "IN",
+    "Population": 6732219,
+    "Voted": "Red"
+  },
+  {
+    "State": "Iowa",
+    "Abbrev": "Iowa",
+    "Code": "IA",
+    "Population": 3155070,
+    "Voted": "Red"
+  },
+  {
+    "State": "Kansas",
+    "Abbrev": "Kans.",
+    "Code": "KS",
+    "Population": 2913314,
+    "Voted": "Red"
+  },
+  {
+    "State": "Kentucky",
+    "Abbrev": "Ky.",
+    "Code": "KY",
+    "Population": 4467673,
+    "Voted": "Red"
+  },
+  {
+    "State": "Louisiana",
+    "Abbrev": "La.",
+    "Code": "LA",
+    "Population": 4648794,
+    "Voted": "Red"
+  },
+  {
+    "State": "Maine",
+    "Abbrev": "Maine",
+    "Code": "ME",
+    "Population": 1344212,
+    "Voted": "Blue"
+  },
+  {
+    "State": "Maryland",
+    "Abbrev": "Md.",
+    "Code": "MD",
+    "Population": 6045680,
+    "Voted": "Blue"
+  },
+  {
+    "State": "Massachusetts",
+    "Abbrev": "Mass.",
+    "Code": "MA",
+    "Population": 6949503,
+    "Voted": "Blue"
+  },
+  {
+    "State": "Michigan",
+    "Abbrev": "Mich.",
+    "Code": "MI",
+    "Population": 9986857,
+    "Voted": "Blue"
+  },
+  {
+    "State": "Minnesota",
+    "Abbrev": "Minn.",
+    "Code": "MN",
+    "Population": 5639632,
+    "Voted": "Blue"
+  },
+  {
+    "State": "Mississippi",
+    "Abbrev": "Miss.",
+    "Code": "MS",
+    "Population": 2976149,
+    "Voted": "Red"
+  },
+  {
+    "State": "Missouri",
+    "Abbrev": "Mo.",
+    "Code": "MO",
+    "Population": 6137428,
+    "Voted": "Red"
+  },
+  {
+    "State": "Montana",
+    "Abbrev": "Mont.",
+    "Code": "MT",
+    "Population": 1068778,
+    "Voted": "Red"
+  },
+  {
+    "State": "Nebraska",
+    "Abbrev": "Nebr.",
+    "Code": "NE",
+    "Population": 1934408,
+    "Voted": "Red"
+  },
+  {
+    "State": "Nevada",
+    "Abbrev": "Nev.",
+    "Code": "NV",
+    "Population": 3080156,
+    "Voted": "Blue"
+  },
+  {
+    "State": "New Hampshire",
+    "Abbrev": "N.H.",
+    "Code": "NH",
+    "Population": 1359711,
+    "Voted": "Blue"
+  },
+  {
+    "State": "New Jersey",
+    "Abbrev": "N.J.",
+    "Code": "NJ",
+    "Population": 8882190,
+    "Voted": "Blue"
+  },
+  {
+    "State": "New Mexico",
+    "Abbrev": "N.M.",
+    "Code": "NM",
+    "Population": 2096829,
+    "Voted": "Blue"
+  },
+  {
+    "State": "New York",
+    "Abbrev": "N.Y.",
+    "Code": "NY",
+    "Population": 19453561,
+    "Voted": "Blue"
+  },
+  {
+    "State": "North Carolina",
+    "Abbrev": "N.C.",
+    "Code": "NC",
+    "Population": 10488084,
+    "Voted": "Red"
+  },
+  {
+    "State": "North Dakota",
+    "Abbrev": "N.D.",
+    "Code": "ND",
+    "Population": 762062,
+    "Voted": "Red"
+  },
+  {
+    "State": "Northern Mariana Islands",
+    "Abbrev": "US-MP",
+    "Code": "MP",
+    "Population": 55194,
+    "Voted": "None"
+  },
+  {
+    "State": "Ohio",
+    "Abbrev": "Ohio",
+    "Code": "OH",
+    "Population": 11689100,
+    "Voted": "Red"
+  },
+  {
+    "State": "Oklahoma",
+    "Abbrev": "Okla.",
+    "Code": "OK",
+    "Population": 3956971,
+    "Voted": "Red"
+  },
+  {
+    "State": "Oregon",
+    "Abbrev": "Ore.",
+    "Code": "OR",
+    "Population": 4217737,
+    "Voted": "Blue"
+  },
+  {
+    "State": "Pennsylvania",
+    "Abbrev": "Pa.",
+    "Code": "PA",
+    "Population": 12801989,
+    "Voted": "Blue"
+  },
+  {
+    "State": "Rhode Island",
+    "Abbrev": "R.I.",
+    "Code": "RI",
+    "Population": 1059361,
+    "Voted": "Blue"
+  },
+  {
+    "State": "South Carolina",
+    "Abbrev": "S.C.",
+    "Code": "SC",
+    "Population": 5148714,
+    "Voted": "Red"
+  },
+  {
+    "State": "South Dakota",
+    "Abbrev": "S.D.",
+    "Code": "SD",
+    "Population": 884659,
+    "Voted": "Red"
+  },
+  {
+    "State": "Tennessee",
+    "Abbrev": "Tenn.",
+    "Code": "TN",
+    "Population": 6833174,
+    "Voted": "Red"
+  },
+  {
+    "State": "Texas",
+    "Abbrev": "Tex.",
+    "Code": "TX",
+    "Population": 28995881,
+    "Voted": "Red"
+  },
+  {
+    "State": "Utah",
+    "Abbrev": "Utah",
+    "Code": "UT",
+    "Population": 3205958,
+    "Voted": "Red"
+  },
+  {
+    "State": "Vermont",
+    "Abbrev": "Vt.",
+    "Code": "VT",
+    "Population": 623989,
+    "Voted": "Blue"
+  },
+  {
+    "State": "Virginia",
+    "Abbrev": "Va.",
+    "Code": "VA",
+    "Population": 8535519,
+    "Voted": "Blue"
+  },
+  {
+    "State": "Virgin Islands",
+    "Abbrev": "US-VI",
+    "Code": "VI",
+    "Population": 104914,
+    "Voted": "None"
+  },
+  {
+    "State": "Washington",
+    "Abbrev": "Wash.",
+    "Code": "WA",
+    "Population": 7614893,
+    "Voted": "Blue"
+  },
+  {
+    "State": "West Virginia",
+    "Abbrev": "W.Va.",
+    "Code": "WV",
+    "Population": 1792147,
+    "Voted": "Red"
+  },
+  {
+    "State": "Wisconsin",
+    "Abbrev": "Wis.",
+    "Code": "WI",
+    "Population": 5822434,
+    "Voted": "Blue"
+  },
+  {
+    "State": "Wyoming",
+    "Abbrev": "Wyo.",
+    "Code": "WY",
+    "Population": 578759,
+    "Voted": "Red"
+  }
+]}
