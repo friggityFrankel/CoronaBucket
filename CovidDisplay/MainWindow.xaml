@@ -5,16 +5,23 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CovidDisplay"
         mc:Ignorable="d"
-        Title="MainWindow"
-        MinHeight="400"
-        MinWidth="1000">
+        Title="Corona Bucket"
+        Height="600"
+        Width="1000"
+        Loaded="OnLoaded">
     <Window.Resources>
         <Style TargetType="Label">
             <Setter Property="Padding"
                     Value="0" />
             <Setter Property="FontSize"
-                    Value="16" />
+                    Value="14" />
         </Style>
+
+        <DataTemplate x:Key="StateItemTemplate">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="{Binding Name}" />
+            </StackPanel>
+        </DataTemplate>
     </Window.Resources>
 
     <Grid>
@@ -28,16 +35,22 @@
             <RowDefinition Height="44" />
         </Grid.RowDefinitions>
 
-        <StackPanel Grid.Row="0"
+        <StackPanel Name="WorldResultsGrid"
+                    Grid.Row="0"
                     Grid.Column="0"
                     Margin="4">
-            <Label Content="World Results"
-                   FontSize="16"
-                   FontWeight="Bold" />
+            <TextBlock Text="{Binding Name}"
+                       FontSize="16"
+                       FontWeight="Bold" />
 
-            <Label Content="pop 7,742,277,000"
-                   FontSize="12"
-                   FontStyle="Italic" />
+            <StackPanel Orientation="Horizontal">
+                <Label Content="pop "
+                       FontSize="12"
+                       FontStyle="Italic" />
+                <TextBlock Text="{Binding Population, StringFormat='{}{0:#,#}'}"
+                           FontSize="12"
+                           FontStyle="Italic" />
+            </StackPanel>
 
             <Grid Margin="4">
                 <Grid.ColumnDefinitions>
@@ -67,38 +80,161 @@
                     <RowDefinition Height="22" />
                 </Grid.RowDefinitions>
 
-                <Label Content="Vaccinations:  Total Per% (Increase | 7-Day Avg)"
-                       Grid.Row="0" />
+                <Grid Grid.Row="0">
+                    <Label Content="Vaccinations:" />
+                    <Label Content="Total Per% (Increase | 7-Day Avg)"
+                           HorizontalAlignment="Right" />
+                </Grid>
 
-                <Label Content="Total Doses"
+                <Label Content="TOTAL DOSES"
                        FontSize="10"
                        Grid.Row="1" />
                 <StackPanel Orientation="Horizontal"
                             Grid.Row="2"
                             Margin="8,0">
-                    <Label Content="3,128,764,855" />
-                    <Label Content="11.45%"
-                           Padding="8,0" />
-                    <Label Content="(+41,300,885 | 50,000,000)" />
+                    <TextBlock Text="{Binding Current.DosesTotal, StringFormat='{}{0:#,#}'}" />
+                    <TextBlock Text="{Binding Percent.DosesTotal, StringFormat='{}{0:0.00}%'}"
+                               Padding="8,0" />
+                    <TextBlock Text="(" />
+                    <TextBlock Text="{Binding Change.DosesTotal, StringFormat='{}{0:#,#}'}" />
+                    <TextBlock Text=" | " />
+                    <TextBlock Text="{Binding Trend.DosesTotal, StringFormat='{}{0:#,#.0}'}" />
+                    <TextBlock Text=")" />
                 </StackPanel>
 
                 <Label Content="At Least 1st Dose"
                        Grid.Row="3" />
+                <StackPanel Orientation="Horizontal"
+                            Grid.Row="4"
+                            Margin="8,0">
+                    <TextBlock Text="{Binding Current.DosesFirst, StringFormat='{}{0:#,#}'}" />
+                    <TextBlock Text="{Binding Percent.DosesFirst, StringFormat='{}{0:0.00}%'}"
+                               Padding="8,0" />
+                    <TextBlock Text="(" />
+                    <TextBlock Text="{Binding Change.DosesFirst, StringFormat='{}{0:#,#}'}" />
+                    <TextBlock Text=" | " />
+                    <TextBlock Text="{Binding Trend.DosesFirst, StringFormat='{}{0:#,#.0}'}" />
+                    <TextBlock Text=")" />
+                </StackPanel>
+
                 <Label Content="Fully Vaccinated"
                        Grid.Row="5" />
+                <StackPanel Orientation="Horizontal"
+                            Grid.Row="6"
+                            Margin="8,0">
+                    <TextBlock Text="{Binding Current.DosesFully, StringFormat='{}{0:#,#}'}" />
+                    <TextBlock Text="{Binding Percent.DosesFully, StringFormat='{}{0:0.00}%'}"
+                               Padding="8,0" />
+                    <TextBlock Text="(" />
+                    <TextBlock Text="{Binding Change.DosesFully, StringFormat='{}{0:#,#}'}" />
+                    <TextBlock Text=" | " />
+                    <TextBlock Text="{Binding Trend.DosesFully, StringFormat='{}{0:#,#.0}'}" />
+                    <TextBlock Text=")" />
+                </StackPanel>
 
                 <Label Content="Cases"
-                       Grid.Row="7"
+                       Grid.Row="8"
                        VerticalAlignment="Bottom" />
+
                 <Label Content="Confirmed"
                        Grid.Row="9" />
+                <StackPanel Orientation="Horizontal"
+                            Grid.Row="10"
+                            Margin="8,0">
+                    <TextBlock Text="{Binding Current.Confirmed, StringFormat='{}{0:#,#}'}" />
+                    <TextBlock Text="{Binding Percent.Confirmed, StringFormat='{}{0:0.00}%'}"
+                               Padding="8,0" />
+                    <TextBlock Text="(" />
+                    <TextBlock Text="{Binding Change.Confirmed, StringFormat='{}{0:#,#}'}" />
+                    <TextBlock Text=" | " />
+                    <TextBlock Text="{Binding Trend.Confirmed, StringFormat='{}{0:#,#.0}'}" />
+                    <TextBlock Text=")" />
+                </StackPanel>
+
                 <Label Content="Deaths"
                        Grid.Row="11" />
+                <StackPanel Orientation="Horizontal"
+                            Grid.Row="12"
+                            Margin="8,0">
+                    <TextBlock Text="{Binding Current.Deaths, StringFormat='{}{0:#,#}'}" />
+                    <TextBlock Text="{Binding Percent.Deaths, StringFormat='{}{0:0.00}%'}"
+                               Padding="8,0" />
+                    <TextBlock Text="(" />
+                    <TextBlock Text="{Binding Change.Deaths, StringFormat='{}{0:#,#}'}" />
+                    <TextBlock Text=" | " />
+                    <TextBlock Text="{Binding Trend.Deaths, StringFormat='{}{0:#,#.0}'}" />
+                    <TextBlock Text=")" />
+                </StackPanel>
+
                 <Label Content="Recovered"
                        Grid.Row="13" />
+                <StackPanel Orientation="Horizontal"
+                            Grid.Row="14"
+                            Margin="8,0">
+                    <TextBlock Text="{Binding Current.Recovered, StringFormat='{}{0:#,#}'}" />
+                    <TextBlock Text="{Binding Percent.Recovered, StringFormat='{}{0:0.00}%'}"
+                               Padding="8,0" />
+                    <TextBlock Text="(" />
+                    <TextBlock Text="{Binding Change.Recovered, StringFormat='{}{0:#,#}'}" />
+                    <TextBlock Text=" | " />
+                    <TextBlock Text="{Binding Trend.Recovered, StringFormat='{}{0:#,#.0}'}" />
+                    <TextBlock Text=")" />
+                </StackPanel>
+
                 <Label Content="Unresolved"
                        Grid.Row="15" />
+                <StackPanel Orientation="Horizontal"
+                            Grid.Row="16"
+                            Margin="8,0">
+                    <TextBlock Text="{Binding Current.Unresolved, StringFormat='{}{0:#,#}'}" />
+                    <TextBlock Text="{Binding Percent.Unresolved, StringFormat='{}{0:0.00}%'}"
+                               Padding="8,0" />
+                    <TextBlock Text="(" />
+                    <TextBlock Text="{Binding Change.Unresolved, StringFormat='{}{0:#,#}'}" />
+                    <TextBlock Text=" | " />
+                    <TextBlock Text="{Binding Trend.Unresolved, StringFormat='{}{0:#,#.0}'}" />
+                    <TextBlock Text=")" />
+                </StackPanel>
             </Grid>
         </StackPanel>
+
+        <StackPanel Grid.Column="1"
+                    Name="CountriesPanel">
+            <Label Content="Countries"
+                   FontSize="16"
+                   FontWeight="Bold" />
+
+            <ListBox Name="CountriesList"
+                     Margin="4"
+                     Height="300"
+                     ItemTemplate="{StaticResource StateItemTemplate}"
+                     SelectionChanged="StateSelection_Changed" />
+        </StackPanel>
+
+        <StackPanel Grid.Column="2"
+                    Name="StatesPanel">
+            <Label Content="States"
+                   FontSize="16"
+                   FontWeight="Bold" />
+
+            <ListBox Name="StatesList"
+                     Margin="4"
+                     Height="300"
+                     ItemTemplate="{StaticResource StateItemTemplate}"
+                     SelectionChanged="StateSelection_Changed" />
+        </StackPanel>
+
+        <Button Grid.Column="0"
+                Grid.Row="1"
+                Margin="4"
+                Content="Refresh"
+                Click="Refresh_Click" />
+
+        <Label Name="DebugLabel"
+               Grid.Column="1"
+               Grid.Row="1"
+               Content="Debug..."
+               HorizontalContentAlignment="Center"
+               VerticalContentAlignment="Center" />
     </Grid>
 </Window>

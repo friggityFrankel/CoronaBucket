@@ -582,7 +582,7 @@ namespace CovidNumbers
             lines.Add($"p[Unresolved]p: {current.Unresolved.ToString("N0", CultureInfo.CurrentCulture)} (+{(current.Unresolved - change.Unresolved).ToString("N0", CultureInfo.CurrentCulture)})");
             lines.Add("");
             lines.Add($"r{{U}}rb[S]bb{{A}}b s[pop. {usRegion.Population.ToString("N0", CultureInfo.CurrentCulture)}]s totals:");
-            lines.Add($"*[Total Doses]*: {usVaccine.Total.ToString("N0", CultureInfo.CurrentCulture)} (+{usRegion.VaccineChange().Total.ToString("N0", CultureInfo.CurrentCulture)} | {usRegion})");
+            lines.Add($"*[Total Doses]*: {usVaccine.Total.ToString("N0", CultureInfo.CurrentCulture)} (+{usRegion.VaccineChange().Total.ToString("N0", CultureInfo.CurrentCulture)})");
             lines.Add($"*[At Least 1st Dose]*: {usVaccine.Partial.ToString("N0", CultureInfo.CurrentCulture)} s[{(usVaccinePercents.Partial).ToString("N2", CultureInfo.CurrentCulture)}%]s (+{usRegion.VaccineChange().Partial.ToString("N0", CultureInfo.CurrentCulture)})");
             lines.Add($"*[Fully Vaccinated]*: {usVaccine.Fully.ToString("N0", CultureInfo.CurrentCulture)} s[{(usVaccinePercents.Fully).ToString("N2", CultureInfo.CurrentCulture)}%]s (+{usRegion.VaccineChange().Fully.ToString("N0", CultureInfo.CurrentCulture)})");
             lines.Add($"Cases: {usRegion.CurrentCases.Confirmed.ToString("N0", CultureInfo.CurrentCulture)} (+{usChange.Confirmed.ToString("N0", CultureInfo.CurrentCulture)})");
