@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 
 namespace Classes
@@ -32,19 +33,28 @@ namespace Classes
         {
             get
             {
-                var c1 = new DailyNumbers();
+                var c1 = Current;
                 var c2 = new DailyNumbers();
-                if (DailyNumbers.Count > 0)
+                if (DailyNumbers.Count > 1)
                 {
-                    c1 = DailyNumbers.OrderByDescending(d => d.Date).First();
-                    if (DailyNumbers.Count > 1)
+                    var cases = DailyNumbers.OrderByDescending(d => d.Date).Skip(1).Where(d => d.Confirmed > 0).FirstOrDefault();
+                    var vacs = DailyNumbers.OrderByDescending(d => d.Date).Skip(1).Where(d => d.DosesTotal > 0).FirstOrDefault();
+                    if (cases != null)
                     {
-                        c2 = DailyNumbers.OrderByDescending(d => d.Date).Skip(1).First();
+                        c2.Confirmed = cases.Confirmed;
+                        c2.Deaths = cases.Deaths;
+                        c2.Recovered = cases.Recovered;
                     }
-                    else
+                    if (vacs != null)
                     {
-                        c2 = c1;
+                        c2.DosesTotal = vacs.DosesTotal;
+                        c2.DosesFirst = vacs.DosesFirst;
+                        c2.DosesFully = vacs.DosesFully;
                     }
+                }
+                else
+                {
+                    c2 = c1;
                 }
                 return ChangeOf(c1, c2);
             }
@@ -112,6 +122,46 @@ namespace Classes
                 }
 
                 return trend;
+            }
+        }
+
+        public List<string> ToPost
+        {
+            get
+            {
+                var lines = new List<string>();
+                if (Name == "World")
+                {
+                    lines.Add($"b{{World Wide}}b totals s[pop. {Population.ToString("N0", CultureInfo.CurrentCulture)}]s:");
+                    lines.Add("/[Total s[Percent]s (Change | Trend)]/");
+                    lines.Add($"*[n[Total Doses Administered]n]*: {Current.DosesTotal.ToString("N0", CultureInfo.CurrentCulture)} (+{Change.DosesTotal.ToString("N0", CultureInfo.CurrentCulture)} | +{Trend.DosesTotal.ToString("N0", CultureInfo.CurrentCulture)})".Replace("+-", "-"));
+                    lines.Add($"*[b{{Fully Vaccinated}}b]*: {Current.DosesFully.ToString("N0", CultureInfo.CurrentCulture)} s[{Percent.DosesFully.ToString("N2", CultureInfo.CurrentCulture)}%]s (+{Change.DosesFully.ToString("N0", CultureInfo.CurrentCulture)} | +{Trend.DosesFully.ToString("N0", CultureInfo.CurrentCulture)})".Replace("+-", "-"));
+                    lines.Add("-----");
+                    lines.Add($"y{{Cases}}y: {Current.Confirmed.ToString("N0", CultureInfo.CurrentCulture)} s[{Percent.Confirmed.ToString("N2", CultureInfo.CurrentCulture)}%]s (+{Change.Confirmed.ToString("N0", CultureInfo.CurrentCulture)} | +{Trend.Confirmed.ToString("N0", CultureInfo.CurrentCulture)})".Replace("+-", "-"));
+                    lines.Add($"r{{Deaths}}r: {Current.Deaths.ToString("N0", CultureInfo.CurrentCulture)} (+{Change.Deaths.ToString("N0", CultureInfo.CurrentCulture)} | +{Trend.Deaths.ToString("N0", CultureInfo.CurrentCulture)})".Replace("+-", "-"));
+                    lines.Add($"g{{Recovered}}g: {Current.Recovered.ToString("N0", CultureInfo.CurrentCulture)} (+{Change.Recovered.ToString("N0", CultureInfo.CurrentCulture)} | +{Trend.Recovered.ToString("N0", CultureInfo.CurrentCulture)})".Replace("+-", "-"));
+                    lines.Add($"p[Unresolved]p: {Current.Unresolved.ToString("N0", CultureInfo.CurrentCulture)} (+{Change.Unresolved.ToString("N0", CultureInfo.CurrentCulture)} | +{Trend.Unresolved.ToString("N0", CultureInfo.CurrentCulture)})".Replace("+-", "-"));
+                    lines.Add("");
+                }
+                else
+                {
+                    if (Name == "US")
+                    {
+                        lines.Add("r{U}rb[S]bb{A}b s[pop. " + Population.ToString("N0", CultureInfo.CurrentCulture) + "]s");
+                    }
+                    else
+                    {
+                        lines.Add($"b[{Name}]b s[pop. {Population.ToString("N0", CultureInfo.CurrentCulture)}]s");
+                    }
+                    lines.Add($"• Total Doses Administered: {Current.DosesTotal.ToString("N0", CultureInfo.CurrentCulture)} (+{Change.DosesTotal.ToString("N0", CultureInfo.CurrentCulture)} | +{Trend.DosesTotal.ToString("N0", CultureInfo.CurrentCulture)})".Replace("+-", "-"));
+                    lines.Add($"• At Least 1st Dose: {Current.DosesFirst.ToString("N0", CultureInfo.CurrentCulture)} s[{Percent.DosesFirst.ToString("N2", CultureInfo.CurrentCulture)}%]s (+{Change.DosesFirst.ToString("N0", CultureInfo.CurrentCulture)} | +{Trend.DosesFirst.ToString("N0", CultureInfo.CurrentCulture)})".Replace("+-", "-"));
+                    lines.Add($"• Fully Vaccinated: {Current.DosesFully.ToString("N0", CultureInfo.CurrentCulture)} s[{Percent.DosesFully.ToString("N2", CultureInfo.CurrentCulture)}%]s (+{Change.DosesFully.ToString("N0", CultureInfo.CurrentCulture)} | +{Trend.DosesFully.ToString("N0", CultureInfo.CurrentCulture)})".Replace("+-", "-"));
+                    lines.Add("---");
+                    lines.Add($"• Cases: {Current.Confirmed.ToString("N0", CultureInfo.CurrentCulture)} s[{Percent.Confirmed.ToString("N2", CultureInfo.CurrentCulture)}%]s (+{Change.Confirmed.ToString("N0", CultureInfo.CurrentCulture)} | +{Trend.Confirmed.ToString("N0", CultureInfo.CurrentCulture)})".Replace("+-", "-"));
+                    lines.Add($"• Deaths: {Current.Deaths.ToString("N0", CultureInfo.CurrentCulture)} (+{Change.Deaths.ToString("N0", CultureInfo.CurrentCulture)} | +{Trend.Deaths.ToString("N0", CultureInfo.CurrentCulture)})".Replace("+-", "-"));
+                    lines.Add("");
+                }
+                return lines;
             }
         }
     }

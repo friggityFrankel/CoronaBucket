@@ -209,6 +209,7 @@
                      Height="300"
                      ItemTemplate="{StaticResource StateItemTemplate}"
                      SelectionChanged="StateSelection_Changed" />
+
         </StackPanel>
 
         <StackPanel Grid.Column="2"
@@ -236,5 +237,11 @@
                Content="Debug..."
                HorizontalContentAlignment="Center"
                VerticalContentAlignment="Center" />
+
+        <Button Grid.Column="2"
+                Grid.Row="1"
+                Margin="4"
+                Content="Write"
+                Click="Write_Click" />
     </Grid>
 </Window>

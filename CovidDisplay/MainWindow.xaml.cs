@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -19,6 +20,8 @@ namespace CovidDisplay
         public DateTime startDate = DateTime.Today.AddDays(-7);
         public string filePath = @"D:\temp\";
         public State world;
+        public List<JsonDailyData> casesList;
+        public List<JsonVaccineData> vaccinesList;
 
         public MainWindow()
         {
@@ -31,10 +34,17 @@ namespace CovidDisplay
 
         private void Refresh()
         {
+            DebugLabel.Content = "Retrieving...";
+
+            casesList = GetDailyData();
+            vaccinesList = GetVaccines();
+
             world = BuildWorld();
-            CountriesList.ItemsSource = BuildCountryList(); //this is also where World gets its vaccines from
+            CountriesList.ItemsSource = BuildCountryList();
             StatesList.ItemsSource = BuildUnitedStatesList();
+
             WorldResultsGrid.DataContext = world;
+
             DebugLabel.Content = "Completed";
         }
 
@@ -92,8 +102,7 @@ namespace CovidDisplay
             }
 
             // Get Vaccines
-            var vaccineList = GetVaccines();
-            foreach (var vac in vaccineList)
+            foreach (var vac in vaccinesList)
             {
                 var country = countryList.SingleOrDefault(c => c.Abbreviation == vac.iso_code);
                 if (country != null)
@@ -101,7 +110,7 @@ namespace CovidDisplay
                     var previousNumbers = country.DailyNumbers.FirstOrDefault();
 
                     DateTime.TryParse(vac.date, out DateTime date);
-                    double.TryParse(vac.daily_vaccinations_raw, out double total);
+                    double.TryParse(vac.total_vaccinations, out double total);
                     double.TryParse(vac.people_vaccinated, out double partial);
                     double.TryParse(vac.people_fully_vaccinated, out double fully);
 
@@ -129,27 +138,9 @@ namespace CovidDisplay
 
                     country.DailyNumbers.Insert(0, dailyNumbers);
                 }
-                else if (vac.location == "World")
-                {
-                    DateTime.TryParse(vac.date, out DateTime date);
-                    double.TryParse(vac.daily_vaccinations_raw, out double total);
-                    double.TryParse(vac.people_vaccinated, out double partial);
-                    double.TryParse(vac.people_fully_vaccinated, out double fully);
-
-                    var dailyNumbers = world.DailyNumbers.SingleOrDefault(d => d.Date == date);
-                    if (dailyNumbers == null)
-                    {
-                        dailyNumbers = new DailyNumbers();
-                        world.DailyNumbers.Add(dailyNumbers);
-                    }
-                    dailyNumbers.DosesTotal = total;
-                    dailyNumbers.DosesFirst = partial;
-                    dailyNumbers.DosesFully = fully;
-                }
             }
 
             // Get Cases
-            var casesList = GetDailyData();
             foreach (var cases in casesList)
             {
                 var country = countryList.SingleOrDefault(c => c.Name == cases.countryRegion);
@@ -198,6 +189,7 @@ namespace CovidDisplay
             var vaccineList = GetUSVaccines();
             foreach (var stateInfo in stateInfoList.states)
             {
+                // Build state with population
                 var newState = new State()
                 {
                     Name = stateInfo.State,
@@ -205,11 +197,12 @@ namespace CovidDisplay
                     Population = stateInfo.Population
                 };
 
-                var vacList = vaccineList.Where(v => v.location == newState.Name);
+                // Get Vaccines
+                var vacList = vaccineList.Where(v => v.location == newState.Name).OrderByDescending(v => v.date);
                 foreach (var vac in vacList)
                 {
                     DateTime.TryParse(vac.date, out DateTime date);
-                    double.TryParse(vac.daily_vaccinations_raw, out double total);
+                    double.TryParse(vac.total_vaccinations, out double total);
                     double.TryParse(vac.people_vaccinated, out double partial);
                     double.TryParse(vac.people_fully_vaccinated, out double fully);
 
@@ -223,6 +216,42 @@ namespace CovidDisplay
                     newState.DailyNumbers.Add(dailyNumbers);
                 }
 
+                // Get Cases
+                var caseList = casesList.Where(c => c.provinceState == newState.Name);
+                foreach (var cases in caseList)
+                {
+                    double.TryParse(cases.confirmed, out double confirmed);
+                    double.TryParse(cases.deaths, out double deaths);
+                    double.TryParse(cases.recovered, out double recovered);
+
+                    var dailyNumbers = newState.DailyNumbers.FirstOrDefault(d => d.Date == cases.date);
+                    if (dailyNumbers != null)
+                    {
+                        dailyNumbers.Confirmed += confirmed;
+                        dailyNumbers.Deaths += deaths;
+                        dailyNumbers.Recovered += recovered;
+                    }
+                    else
+                    {
+                        dailyNumbers = new DailyNumbers();
+                        dailyNumbers.Confirmed = confirmed;
+                        dailyNumbers.Deaths = deaths;
+                        dailyNumbers.Recovered = recovered;
+
+                        var previous = newState.DailyNumbers.FirstOrDefault(d => d.Date == cases.date.AddDays(-1));
+                        if (previous != null)
+                        {
+                            dailyNumbers.DosesTotal = previous.DosesTotal;
+                            dailyNumbers.DosesFirst = previous.DosesFirst;
+                            dailyNumbers.DosesFully = previous.DosesFully;
+                        }
+
+                        newState.DailyNumbers.Add(dailyNumbers);
+
+                        newState.DailyNumbers = newState.DailyNumbers.OrderByDescending(d => d.Date).ToList();
+                    }
+                }
+
                 stateList.Add(newState);
             }
 
@@ -231,7 +260,6 @@ namespace CovidDisplay
 
         private State BuildWorld()
         {
-            Console.WriteLine("Get Current World...");
             var world = new State()
             {
                 Name = "World",
@@ -240,49 +268,32 @@ namespace CovidDisplay
 
             for (DateTime i = startDate; i < DateTime.Today; i = i.AddDays(1))
             {
-                var dailyNumber = new DailyNumbers(i);
-                var fileName = $"{i.ToString("yyyyMMdd")}.txt";
-                var jsonString = "";
-                if (i < DateTime.Now.AddDays(-3) && File.Exists(Path.Combine(filePath + @"json\", fileName)))
+                var dailyNumbers = new DailyNumbers(i);
+                var vac = vaccinesList.Where(v => v.date == i.ToString("yyyy-MM-dd") && v.location == "World").FirstOrDefault();
+
+                if (vac != null)
                 {
-                    jsonString = File.ReadAllText(Path.Combine(filePath + @"json\", fileName));
-                }
-                else
-                {
-                    jsonString = GetJsonString($"https://covid19.mathdro.id/api/daily/{i.ToString("MM-dd-yyyy")}");
+                    double.TryParse(vac.total_vaccinations, out double total);
+                    double.TryParse(vac.people_vaccinated, out double partial);
+                    double.TryParse(vac.people_fully_vaccinated, out double fully);
+
+                    dailyNumbers.DosesTotal = total;
+                    dailyNumbers.DosesFirst = partial;
+                    dailyNumbers.DosesFully = fully;
                 }
 
-                if (!string.IsNullOrWhiteSpace(jsonString))
+                foreach (var cases in casesList.Where(c => c.date == i))
                 {
-                    try
-                    {
+                    double.TryParse(cases.confirmed, out double confirmed);
+                    double.TryParse(cases.deaths, out double deaths);
+                    double.TryParse(cases.recovered, out double recovered);
 
-                        var jsonData = JsonConvert.DeserializeObject<List<JsonDailyData>>(jsonString);
-                        foreach (var item in jsonData)
-                        {
-                            if (!string.IsNullOrWhiteSpace(item.confirmed))
-                            {
-                                double.TryParse(item.confirmed, out double confirmed);
-                                dailyNumber.Confirmed += confirmed;
-                            }
-                            if (!string.IsNullOrWhiteSpace(item.deaths))
-                            {
-                                double.TryParse(item.deaths, out double deaths);
-                                dailyNumber.Deaths += deaths;
-                            }
-                            if (!string.IsNullOrWhiteSpace(item.recovered))
-                            {
-                                double.TryParse(item.recovered, out double recovered);
-                                dailyNumber.Recovered += recovered;
-                            }
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine(ex.Message);
-                    }
+                    dailyNumbers.Confirmed += confirmed;
+                    dailyNumbers.Deaths += deaths;
+                    dailyNumbers.Recovered += recovered;
                 }
-                world.DailyNumbers.Add(dailyNumber);
+
+                world.DailyNumbers.Add(dailyNumbers);
             }
 
             return world;
@@ -293,8 +304,6 @@ namespace CovidDisplay
             var resultsList = new List<JsonDailyData>();
             for (var i = startDate; i < DateTime.Now; i = i.AddDays(1))
             {
-                Console.WriteLine($"Retrieving: {i}...");
-                DebugLabel.Content = $"Retrieving: {i}...";
                 try
                 {
                     var fileName = $"{i.ToString("yyyyMMdd")}.txt";
@@ -334,8 +343,6 @@ namespace CovidDisplay
 
         private List<JsonVaccineData> GetVaccines()
         {
-            Console.WriteLine("Get Vaccines...");
-            DebugLabel.Content = "Get Vaccines...";
             var vacList = new List<JsonVaccineData>();
             var jsonString = GetJsonString(@"https://raw.githubusercontent.com/owid/covid-19-data/master/public/data/vaccinations/vaccinations.csv");
 
@@ -368,8 +375,6 @@ namespace CovidDisplay
 
         private List<JsonUSVaccineData> GetUSVaccines()
         {
-            Console.WriteLine("Get US Vaccines...");
-            DebugLabel.Content = "Get US Vaccines...";
             var usVacList = new List<JsonUSVaccineData>();
             var jsonString = GetJsonString(@"https://raw.githubusercontent.com/owid/covid-19-data/master/public/data/vaccinations/us_state_vaccinations.csv");
 
@@ -401,9 +406,9 @@ namespace CovidDisplay
             }
             return usVacList;
         }
+
         private JsonCountries GetCountryInfo()
         {
-            Console.WriteLine("Get Country List");
             var jsonString = GetJsonString("https://covid19.mathdro.id/api/countries/");
             if (!string.IsNullOrWhiteSpace(jsonString))
             {
@@ -443,9 +448,93 @@ namespace CovidDisplay
             return pops;
         }
 
-        private void Refresh_Click(object sender, RoutedEventArgs e) { Refresh(); }
+        private void WriteAll()
+        {
+            WriteWorld();
+            WriteCountries();
+            WriteStates();
+        }
 
-        private void StateSelection_Changed(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        private void WriteWorld()
+        {
+            var countdown = File.ReadAllLines(filePath + "Countdown.txt")[0].Split(';');
+            var countdownDay = DateTime.Parse(countdown[0]);
+            var countdownEvent = countdown[1];
+
+            var previousId = File.ReadAllLines(filePath + "Previously.txt")[0].Split(' ')[1];
+            var previousURL = "https://www.shacknews.com/chatty?id=" + previousId;
+
+            var txtFile = $"{DateTime.Now.ToString("MMdd")}_World-NEW.txt";
+            var lines = new List<string>();
+
+            var us = ((List<State>)CountriesList.ItemsSource).FirstOrDefault(c => c.Name == "US");
+
+            lines.Add($"*[b{{Corona Bucket}}b]*: {(countdownDay - DateTime.Today).Days} Days Till {countdownEvent}");
+            lines.Add("");
+            lines.AddRange(world.ToPost);
+            lines.AddRange(us.ToPost);
+            lines.Add("JHU’s Daily COVID-19 Data in Motion");
+            lines.Add("https://coronavirus.jhu.edu/covid-19-daily-video");
+            lines.Add("");
+            lines.Add("Johns Hopkins University COVID-19 Dashboard");
+            lines.Add("https://gisanddata.maps.arcgis.com/apps/opsdashboard/index.html#/bda7594740fd40299423467b48e9ecf6");
+            lines.Add("");
+            lines.Add("NYTimes US Hotspot Tracker");
+            lines.Add("https://www.nytimes.com/interactive/2020/us/coronavirus-us-cases.html?#hotspots");
+            lines.Add("");
+            lines.Add("Folding @Home");
+            lines.Add("https://foldingathome.org/");
+            lines.Add("Join the Shacknews Folding@Home team to help fight COVID-19 https://apps.foldingathome.org/teamstats/team50784.html");
+            lines.Add("");
+            lines.Add($"#COVID19{DateTime.Today.ToString("yyyyMMdd")}");
+            lines.Add($"Previously in the bucket: {previousURL}");
+
+            File.WriteAllLines(Path.Combine(filePath, txtFile), lines);
+        }
+        private void WriteCountries()
+        {
+            var topCountries = ((List<State>)CountriesList.ItemsSource).Where(c => c.Name != "US").OrderByDescending(c => c.Percent.DosesFully).Take(15);
+            var txtFile = $"{DateTime.Today.ToString("MMdd")}_TopCountries-NEW.txt";
+            var lines = new List<string>();
+            lines.Add("e[Top 15 Countries by Population Fully Vaccinated]e");
+            lines.Add("");
+            foreach (var country in topCountries)
+            {
+                lines.AddRange(country.ToPost);
+            }
+            File.WriteAllLines(Path.Combine(filePath, txtFile), lines);
+        }
+        private void WriteStates()
+        {
+            var topStates = ((List<State>)StatesList.ItemsSource).OrderByDescending(s => s.Percent.DosesFully);
+            var txtFile = $"{DateTime.Today.ToString("MMdd")}_TopStates-NEW.txt";
+            var lines = new List<string>();
+            lines.Add("e[Top 15 US States by Population Fully Vaccinated]e");
+            lines.Add("");
+            foreach (var state in topStates.Take(15))
+            {
+                lines.AddRange(state.ToPost);
+            }
+            lines.Add("\n\n\n\n");
+            lines.Add("e[Remaining US States Alphabetically]e");
+            lines.Add("");
+            var i = 0;
+            foreach (var state in topStates.Skip(15).OrderBy(s => s.Name))
+            {
+                lines.AddRange(state.ToPost);
+                i++;
+                if (i % 15 == 0)
+                {
+                    lines.Add("\n\n\n\n");
+                }
+            }
+            File.WriteAllLines(Path.Combine(filePath, txtFile), lines);
+        }
+
+        private void Refresh_Click(object sender, RoutedEventArgs e) { Refresh(); }
+        private void Write_Click(object sender, RoutedEventArgs e) { WriteAll(); }
+
+        private void StateSelection_Changed(object sender, SelectionChangedEventArgs e)
         {
             if (sender is ListBox listBox && listBox.SelectedItem is State state)
             {
@@ -454,6 +543,7 @@ namespace CovidDisplay
             else
             {
                 WorldResultsGrid.DataContext = world;
+
             }
         }
     }

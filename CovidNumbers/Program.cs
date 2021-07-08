@@ -646,8 +646,6 @@ namespace CovidNumbers
                 lines.Add("-----");
                 lines.Add(countryCases);
                 lines.Add(countryDeaths);
-
-
             }
 
             File.WriteAllLines(Path.Combine(filePath, txtFile), lines);
