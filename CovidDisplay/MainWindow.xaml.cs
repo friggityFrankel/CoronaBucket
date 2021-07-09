@@ -2,7 +2,7 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -16,9 +16,6 @@ namespace CovidDisplay
     /// </summary>
     public partial class MainWindow : Window
     {
-        //public DateTime startDate = new DateTime(2020, 01, 01);
-        public DateTime startDate = DateTime.Today.AddDays(-7);
-        public string filePath = @"D:\temp\";
         public State world;
         public List<JsonDailyData> casesList;
         public List<JsonVaccineData> vaccinesList;
@@ -27,9 +24,11 @@ namespace CovidDisplay
         {
             InitializeComponent();
         }
-
         private void OnLoaded(object sender, RoutedEventArgs e)
         {
+            FilePathTextbox.Text = @"D:\temp\";
+            StartDatePicker.SelectedDate = DateTime.Today.AddDays(-7);
+            StartDatePicker.DisplayDateEnd = DateTime.Today.AddDays(-2);
         }
 
         private void Refresh()
@@ -38,14 +37,15 @@ namespace CovidDisplay
 
             casesList = GetDailyData();
             vaccinesList = GetVaccines();
-
             world = BuildWorld();
+
             CountriesList.ItemsSource = BuildCountryList();
             StatesList.ItemsSource = BuildUnitedStatesList();
-
+            
             WorldResultsGrid.DataContext = world;
 
-            DebugLabel.Content = "Completed";
+            DebugLabel.Content = "Refresh Completed";
+            WriteButton.IsEnabled = true;
         }
 
         private string GetJsonString(string jsonQuery)
@@ -260,6 +260,7 @@ namespace CovidDisplay
 
         private State BuildWorld()
         {
+            var startDate = StartDatePicker.SelectedDate.Value;
             var world = new State()
             {
                 Name = "World",
@@ -301,6 +302,8 @@ namespace CovidDisplay
 
         private List<JsonDailyData> GetDailyData()
         {
+            var startDate = StartDatePicker.SelectedDate.Value;
+            var filePath = FilePathTextbox.Text;
             var resultsList = new List<JsonDailyData>();
             for (var i = startDate; i < DateTime.Now; i = i.AddDays(1))
             {
@@ -420,6 +423,7 @@ namespace CovidDisplay
 
         private JsonStateInfo GetStateInfo()
         {
+            var filePath = FilePathTextbox.Text;
             var fileName = "StateList.json";
             var jsonString = File.ReadAllText(Path.Combine(filePath + @"json\", fileName));
             if (!string.IsNullOrWhiteSpace(jsonString))
@@ -432,6 +436,7 @@ namespace CovidDisplay
 
         private List<JsonPopulationData> GetPopulations()
         {
+            var filePath = FilePathTextbox.Text;
             var pops = new List<JsonPopulationData>();
             var populations = File.ReadAllLines(filePath + "Populations.txt");
             foreach (var item in populations)
@@ -453,10 +458,24 @@ namespace CovidDisplay
             WriteWorld();
             WriteCountries();
             WriteStates();
+
+            DebugLabel.Content = "Write Completed";
+
+            var filePath = FilePathTextbox.Text;
+            if (Directory.Exists(filePath))
+            {
+                ProcessStartInfo startInfo = new ProcessStartInfo()
+                {
+                    Arguments = filePath,
+                    FileName = "explorer.exe"
+                };
+                Process.Start(startInfo);
+            }
         }
 
         private void WriteWorld()
         {
+            var filePath = FilePathTextbox.Text;
             var countdown = File.ReadAllLines(filePath + "Countdown.txt")[0].Split(';');
             var countdownDay = DateTime.Parse(countdown[0]);
             var countdownEvent = countdown[1];
@@ -493,6 +512,7 @@ namespace CovidDisplay
         }
         private void WriteCountries()
         {
+            var filePath = FilePathTextbox.Text;
             var topCountries = ((List<State>)CountriesList.ItemsSource).Where(c => c.Name != "US").OrderByDescending(c => c.Percent.DosesFully).Take(15);
             var txtFile = $"{DateTime.Today.ToString("MMdd")}_TopCountries-NEW.txt";
             var lines = new List<string>();
@@ -506,6 +526,7 @@ namespace CovidDisplay
         }
         private void WriteStates()
         {
+            var filePath = FilePathTextbox.Text;
             var topStates = ((List<State>)StatesList.ItemsSource).OrderByDescending(s => s.Percent.DosesFully);
             var txtFile = $"{DateTime.Today.ToString("MMdd")}_TopStates-NEW.txt";
             var lines = new List<string>();
@@ -546,5 +567,6 @@ namespace CovidDisplay
 
             }
         }
+
     }
 }
