@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 
@@ -14,6 +15,16 @@ namespace Classes
         public State()
         {
             DailyNumbers = new List<DailyNumbers>();
+        }
+
+        public State(DateTime startDate, DateTime endDate)
+        {
+            DailyNumbers = new List<DailyNumbers>();
+
+            for (DateTime i = startDate; i <= endDate; i = i.AddDays(1))
+            {
+                DailyNumbers.Insert(0, new DailyNumbers(i));
+            }
         }
 
         public DailyNumbers Current
@@ -95,7 +106,7 @@ namespace Classes
             }
         }
 
-        public DailyNumbers Trend
+        public DailyNumbers SevenDay
         {
             get
             {
@@ -133,14 +144,14 @@ namespace Classes
                 if (Name == "World")
                 {
                     lines.Add($"b{{World Wide}}b totals s[pop. {Population.ToString("N0", CultureInfo.CurrentCulture)}]s:");
-                    lines.Add("/[Total s[Percent]s (Change | Trend)]/");
-                    lines.Add($"*[n[Total Doses Administered]n]*: {Current.DosesTotal.ToString("N0", CultureInfo.CurrentCulture)} (+{Change.DosesTotal.ToString("N0", CultureInfo.CurrentCulture)} | +{Trend.DosesTotal.ToString("N0", CultureInfo.CurrentCulture)})".Replace("+-", "-"));
-                    lines.Add($"*[b{{Fully Vaccinated}}b]*: {Current.DosesFully.ToString("N0", CultureInfo.CurrentCulture)} s[{Percent.DosesFully.ToString("N2", CultureInfo.CurrentCulture)}%]s (+{Change.DosesFully.ToString("N0", CultureInfo.CurrentCulture)} | +{Trend.DosesFully.ToString("N0", CultureInfo.CurrentCulture)})".Replace("+-", "-"));
+                    lines.Add("/[Total s[Percent]s (Change | 7-Day Average)]/");
+                    lines.Add($"*[n[Total Doses Administered]n]*: {Current.DosesTotal.ToString("N0", CultureInfo.CurrentCulture)} (+{Change.DosesTotal.ToString("N0", CultureInfo.CurrentCulture)} | +{SevenDay.DosesTotal.ToString("N0", CultureInfo.CurrentCulture)})".Replace("+-", "-"));
+                    lines.Add($"*[b{{Fully Vaccinated}}b]*: {Current.DosesFully.ToString("N0", CultureInfo.CurrentCulture)} s[{Percent.DosesFully.ToString("N2", CultureInfo.CurrentCulture)}%]s (+{Change.DosesFully.ToString("N0", CultureInfo.CurrentCulture)} | +{SevenDay.DosesFully.ToString("N0", CultureInfo.CurrentCulture)})".Replace("+-", "-"));
                     lines.Add("-----");
-                    lines.Add($"y{{Cases}}y: {Current.Confirmed.ToString("N0", CultureInfo.CurrentCulture)} s[{Percent.Confirmed.ToString("N2", CultureInfo.CurrentCulture)}%]s (+{Change.Confirmed.ToString("N0", CultureInfo.CurrentCulture)} | +{Trend.Confirmed.ToString("N0", CultureInfo.CurrentCulture)})".Replace("+-", "-"));
-                    lines.Add($"r{{Deaths}}r: {Current.Deaths.ToString("N0", CultureInfo.CurrentCulture)} (+{Change.Deaths.ToString("N0", CultureInfo.CurrentCulture)} | +{Trend.Deaths.ToString("N0", CultureInfo.CurrentCulture)})".Replace("+-", "-"));
-                    lines.Add($"g{{Recovered}}g: {Current.Recovered.ToString("N0", CultureInfo.CurrentCulture)} (+{Change.Recovered.ToString("N0", CultureInfo.CurrentCulture)} | +{Trend.Recovered.ToString("N0", CultureInfo.CurrentCulture)})".Replace("+-", "-"));
-                    lines.Add($"p[Unresolved]p: {Current.Unresolved.ToString("N0", CultureInfo.CurrentCulture)} (+{Change.Unresolved.ToString("N0", CultureInfo.CurrentCulture)} | +{Trend.Unresolved.ToString("N0", CultureInfo.CurrentCulture)})".Replace("+-", "-"));
+                    lines.Add($"y{{Cases}}y: {Current.Confirmed.ToString("N0", CultureInfo.CurrentCulture)} s[{Percent.Confirmed.ToString("N2", CultureInfo.CurrentCulture)}%]s (+{Change.Confirmed.ToString("N0", CultureInfo.CurrentCulture)} | +{SevenDay.Confirmed.ToString("N0", CultureInfo.CurrentCulture)})".Replace("+-", "-"));
+                    lines.Add($"r{{Deaths}}r: {Current.Deaths.ToString("N0", CultureInfo.CurrentCulture)} (+{Change.Deaths.ToString("N0", CultureInfo.CurrentCulture)} | +{SevenDay.Deaths.ToString("N0", CultureInfo.CurrentCulture)})".Replace("+-", "-"));
+                    lines.Add($"g{{Recovered}}g: {Current.Recovered.ToString("N0", CultureInfo.CurrentCulture)} (+{Change.Recovered.ToString("N0", CultureInfo.CurrentCulture)} | +{SevenDay.Recovered.ToString("N0", CultureInfo.CurrentCulture)})".Replace("+-", "-"));
+                    lines.Add($"p[Unresolved]p: {Current.Unresolved.ToString("N0", CultureInfo.CurrentCulture)} (+{Change.Unresolved.ToString("N0", CultureInfo.CurrentCulture)} | +{SevenDay.Unresolved.ToString("N0", CultureInfo.CurrentCulture)})".Replace("+-", "-"));
                     lines.Add("");
                 }
                 else
@@ -153,12 +164,12 @@ namespace Classes
                     {
                         lines.Add($"b[{Name}]b s[pop. {Population.ToString("N0", CultureInfo.CurrentCulture)}]s");
                     }
-                    lines.Add($"• Total Doses Administered: {Current.DosesTotal.ToString("N0", CultureInfo.CurrentCulture)} (+{Change.DosesTotal.ToString("N0", CultureInfo.CurrentCulture)} | +{Trend.DosesTotal.ToString("N0", CultureInfo.CurrentCulture)})".Replace("+-", "-"));
-                    lines.Add($"• At Least 1st Dose: {Current.DosesFirst.ToString("N0", CultureInfo.CurrentCulture)} s[{Percent.DosesFirst.ToString("N2", CultureInfo.CurrentCulture)}%]s (+{Change.DosesFirst.ToString("N0", CultureInfo.CurrentCulture)} | +{Trend.DosesFirst.ToString("N0", CultureInfo.CurrentCulture)})".Replace("+-", "-"));
-                    lines.Add($"• Fully Vaccinated: {Current.DosesFully.ToString("N0", CultureInfo.CurrentCulture)} s[{Percent.DosesFully.ToString("N2", CultureInfo.CurrentCulture)}%]s (+{Change.DosesFully.ToString("N0", CultureInfo.CurrentCulture)} | +{Trend.DosesFully.ToString("N0", CultureInfo.CurrentCulture)})".Replace("+-", "-"));
+                    lines.Add($"• Total Doses Administered: {Current.DosesTotal.ToString("N0", CultureInfo.CurrentCulture)} (+{Change.DosesTotal.ToString("N0", CultureInfo.CurrentCulture)} | +{SevenDay.DosesTotal.ToString("N0", CultureInfo.CurrentCulture)})".Replace("+-", "-"));
+                    lines.Add($"• At Least 1st Dose: {Current.DosesFirst.ToString("N0", CultureInfo.CurrentCulture)} s[{Percent.DosesFirst.ToString("N2", CultureInfo.CurrentCulture)}%]s (+{Change.DosesFirst.ToString("N0", CultureInfo.CurrentCulture)} | +{SevenDay.DosesFirst.ToString("N0", CultureInfo.CurrentCulture)})".Replace("+-", "-"));
+                    lines.Add($"• Fully Vaccinated: {Current.DosesFully.ToString("N0", CultureInfo.CurrentCulture)} s[{Percent.DosesFully.ToString("N2", CultureInfo.CurrentCulture)}%]s (+{Change.DosesFully.ToString("N0", CultureInfo.CurrentCulture)} | +{SevenDay.DosesFully.ToString("N0", CultureInfo.CurrentCulture)})".Replace("+-", "-"));
                     lines.Add("---");
-                    lines.Add($"• Cases: {Current.Confirmed.ToString("N0", CultureInfo.CurrentCulture)} s[{Percent.Confirmed.ToString("N2", CultureInfo.CurrentCulture)}%]s (+{Change.Confirmed.ToString("N0", CultureInfo.CurrentCulture)} | +{Trend.Confirmed.ToString("N0", CultureInfo.CurrentCulture)})".Replace("+-", "-"));
-                    lines.Add($"• Deaths: {Current.Deaths.ToString("N0", CultureInfo.CurrentCulture)} (+{Change.Deaths.ToString("N0", CultureInfo.CurrentCulture)} | +{Trend.Deaths.ToString("N0", CultureInfo.CurrentCulture)})".Replace("+-", "-"));
+                    lines.Add($"• Cases: {Current.Confirmed.ToString("N0", CultureInfo.CurrentCulture)} s[{Percent.Confirmed.ToString("N2", CultureInfo.CurrentCulture)}%]s (+{Change.Confirmed.ToString("N0", CultureInfo.CurrentCulture)} | +{SevenDay.Confirmed.ToString("N0", CultureInfo.CurrentCulture)})".Replace("+-", "-"));
+                    lines.Add($"• Deaths: {Current.Deaths.ToString("N0", CultureInfo.CurrentCulture)} (+{Change.Deaths.ToString("N0", CultureInfo.CurrentCulture)} | +{SevenDay.Deaths.ToString("N0", CultureInfo.CurrentCulture)})".Replace("+-", "-"));
                     lines.Add("");
                 }
                 return lines;

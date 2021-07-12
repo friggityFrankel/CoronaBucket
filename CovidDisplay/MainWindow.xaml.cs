@@ -27,8 +27,8 @@ namespace CovidDisplay
         private void OnLoaded(object sender, RoutedEventArgs e)
         {
             FilePathTextbox.Text = @"D:\temp\";
-            StartDatePicker.SelectedDate = DateTime.Today.AddDays(-7);
-            StartDatePicker.DisplayDateEnd = DateTime.Today.AddDays(-2);
+            RangePicker.Value = 7;
+            GetDatePicker.SelectedDate = DateTime.Today;
         }
 
         private void Refresh()
@@ -41,7 +41,7 @@ namespace CovidDisplay
 
             CountriesList.ItemsSource = BuildCountryList();
             StatesList.ItemsSource = BuildUnitedStatesList();
-            
+
             WorldResultsGrid.DataContext = world;
 
             DebugLabel.Content = "Refresh Completed";
@@ -77,28 +77,27 @@ namespace CovidDisplay
         private List<State> BuildCountryList()
         {
             var countryList = new List<State>();
+            var endDate = GetDatePicker.SelectedDate.Value;
+            var range = (int)RangePicker.Value * -1;
 
-            // Build Countries
+            // Build Countries with populations
             var countryInfoList = GetCountryInfo();
+            var populationList = GetPopulations();
             foreach (var countryInfo in countryInfoList.countries)
             {
-                var newCountry = new State()
+                var newCountry = new State(endDate.AddDays(range), endDate)
                 {
                     Name = countryInfo.name,
                     Abbreviation = countryInfo.iso3
                 };
-                countryList.Add(newCountry);
-            }
 
-            // Get Populations
-            var populationList = GetPopulations();
-            foreach (var pop in populationList)
-            {
-                var country = countryList.SingleOrDefault(c => c.Abbreviation == pop.Iso3);
-                if (country != null)
+                var pop = populationList.SingleOrDefault(c => c.Iso3 == newCountry.Abbreviation);
+                if (pop != null)
                 {
-                    country.Population = pop.Population;
+                    newCountry.Population = pop.Population;
                 }
+
+                countryList.Add(newCountry);
             }
 
             // Get Vaccines
@@ -107,36 +106,18 @@ namespace CovidDisplay
                 var country = countryList.SingleOrDefault(c => c.Abbreviation == vac.iso_code);
                 if (country != null)
                 {
-                    var previousNumbers = country.DailyNumbers.FirstOrDefault();
-
                     DateTime.TryParse(vac.date, out DateTime date);
                     double.TryParse(vac.total_vaccinations, out double total);
                     double.TryParse(vac.people_vaccinated, out double partial);
                     double.TryParse(vac.people_fully_vaccinated, out double fully);
 
-                    if (total == 0 && previousNumbers != null)
+                    var dailyNumbers = country.DailyNumbers.SingleOrDefault(d => d.Date == date);
+                    if (dailyNumbers != null)
                     {
-                        total = previousNumbers.DosesTotal;
+                        dailyNumbers.DosesTotal = total;
+                        dailyNumbers.DosesFirst = partial;
+                        dailyNumbers.DosesFully = fully;
                     }
-
-                    if (partial == 0 && previousNumbers != null)
-                    {
-                        partial = previousNumbers.DosesFirst;
-                    }
-
-                    if (fully == 0 && previousNumbers != null)
-                    {
-                        fully = previousNumbers.DosesFully;
-                    }
-
-                    var dailyNumbers = new DailyNumbers(date)
-                    {
-                        DosesTotal = total,
-                        DosesFirst = partial,
-                        DosesFully = fully
-                    };
-
-                    country.DailyNumbers.Insert(0, dailyNumbers);
                 }
             }
 
@@ -157,24 +138,27 @@ namespace CovidDisplay
                         dailyNumbers.Deaths += deaths;
                         dailyNumbers.Recovered += recovered;
                     }
-                    else
+                }
+            }
+
+            foreach (var country in countryList)
+            {
+                for (int i = country.DailyNumbers.Count - 2; i >= 0; i--)
+                {
+                    var dailyNumbers = country.DailyNumbers[i];
+                    var previous = country.DailyNumbers[i + 1];
+                    if (dailyNumbers.DosesTotal == 0)
                     {
-                        dailyNumbers = new DailyNumbers(cases.date);
-                        dailyNumbers.Confirmed = confirmed;
-                        dailyNumbers.Deaths = deaths;
-                        dailyNumbers.Recovered = recovered;
+                        dailyNumbers.DosesTotal = previous.DosesTotal;
+                        dailyNumbers.DosesFirst = previous.DosesFirst;
+                        dailyNumbers.DosesFully = previous.DosesFully;
+                    }
 
-                        var previous = country.DailyNumbers.FirstOrDefault(d => d.Date == cases.date.AddDays(-1));
-                        if (previous != null)
-                        {
-                            dailyNumbers.DosesTotal = previous.DosesTotal;
-                            dailyNumbers.DosesFirst = previous.DosesFirst;
-                            dailyNumbers.DosesFully = previous.DosesFully;
-                        }
-
-                        country.DailyNumbers.Add(dailyNumbers);
-
-                        country.DailyNumbers = country.DailyNumbers.OrderByDescending(d => d.Date).ToList();
+                    if (dailyNumbers.Confirmed == 0)
+                    {
+                        dailyNumbers.Confirmed = previous.Confirmed;
+                        dailyNumbers.Deaths = previous.Deaths;
+                        dailyNumbers.Recovered = previous.Recovered;
                     }
                 }
             }
@@ -185,74 +169,86 @@ namespace CovidDisplay
         private List<State> BuildUnitedStatesList()
         {
             var stateList = new List<State>();
+            var endDate = GetDatePicker.SelectedDate.Value;
+            var range = (int)RangePicker.Value * -1;
             var stateInfoList = GetStateInfo();
             var vaccineList = GetUSVaccines();
+            var caseList = casesList.Where(c => c.countryRegion == "US");
+
             foreach (var stateInfo in stateInfoList.states)
             {
                 // Build state with population
-                var newState = new State()
+                var newState = new State(endDate.AddDays(range), endDate)
                 {
                     Name = stateInfo.State,
                     Abbreviation = stateInfo.Abbrev,
                     Population = stateInfo.Population
                 };
 
-                // Get Vaccines
-                var vacList = vaccineList.Where(v => v.location == newState.Name).OrderByDescending(v => v.date);
-                foreach (var vac in vacList)
+                stateList.Add(newState);
+            }
+
+            // Get Vaccines
+            foreach (var vac in vaccineList)
+            {
+                var state = stateList.SingleOrDefault(s => s.Name == vac.location.Replace(" State", ""));
+                if (state != null)
                 {
                     DateTime.TryParse(vac.date, out DateTime date);
                     double.TryParse(vac.total_vaccinations, out double total);
                     double.TryParse(vac.people_vaccinated, out double partial);
                     double.TryParse(vac.people_fully_vaccinated, out double fully);
 
-                    var dailyNumbers = new DailyNumbers(date)
+                    var dailyNumbers = state.DailyNumbers.SingleOrDefault(d => d.Date == date);
+                    if (dailyNumbers != null)
                     {
-                        DosesTotal = total,
-                        DosesFirst = partial,
-                        DosesFully = fully
-                    };
-
-                    newState.DailyNumbers.Add(dailyNumbers);
+                        dailyNumbers.DosesTotal = total;
+                        dailyNumbers.DosesFirst = partial;
+                        dailyNumbers.DosesFully = fully;
+                    }
                 }
+            }
 
-                // Get Cases
-                var caseList = casesList.Where(c => c.provinceState == newState.Name);
-                foreach (var cases in caseList)
+            // Get Cases
+            foreach (var cases in caseList)
+            {
+                var state = stateList.SingleOrDefault(s => s.Name == cases.provinceState);
+                if (state != null)
                 {
                     double.TryParse(cases.confirmed, out double confirmed);
                     double.TryParse(cases.deaths, out double deaths);
                     double.TryParse(cases.recovered, out double recovered);
 
-                    var dailyNumbers = newState.DailyNumbers.FirstOrDefault(d => d.Date == cases.date);
+                    var dailyNumbers = state.DailyNumbers.SingleOrDefault(d => d.Date == cases.date);
                     if (dailyNumbers != null)
                     {
                         dailyNumbers.Confirmed += confirmed;
                         dailyNumbers.Deaths += deaths;
                         dailyNumbers.Recovered += recovered;
                     }
-                    else
+                }
+            }
+
+            foreach (var state in stateList)
+            {
+                for (int i = state.DailyNumbers.Count - 2; i >= 0; i--)
+                {
+                    var dailyNumbers = state.DailyNumbers[i];
+                    var previous = state.DailyNumbers[i + 1];
+                    if (dailyNumbers.DosesTotal == 0)
                     {
-                        dailyNumbers = new DailyNumbers();
-                        dailyNumbers.Confirmed = confirmed;
-                        dailyNumbers.Deaths = deaths;
-                        dailyNumbers.Recovered = recovered;
+                        dailyNumbers.DosesTotal = previous.DosesTotal;
+                        dailyNumbers.DosesFirst = previous.DosesFirst;
+                        dailyNumbers.DosesFully = previous.DosesFully;
+                    }
 
-                        var previous = newState.DailyNumbers.FirstOrDefault(d => d.Date == cases.date.AddDays(-1));
-                        if (previous != null)
-                        {
-                            dailyNumbers.DosesTotal = previous.DosesTotal;
-                            dailyNumbers.DosesFirst = previous.DosesFirst;
-                            dailyNumbers.DosesFully = previous.DosesFully;
-                        }
-
-                        newState.DailyNumbers.Add(dailyNumbers);
-
-                        newState.DailyNumbers = newState.DailyNumbers.OrderByDescending(d => d.Date).ToList();
+                    if (dailyNumbers.Confirmed == 0)
+                    {
+                        dailyNumbers.Confirmed = previous.Confirmed;
+                        dailyNumbers.Deaths = previous.Deaths;
+                        dailyNumbers.Recovered = previous.Recovered;
                     }
                 }
-
-                stateList.Add(newState);
             }
 
             return stateList;
@@ -260,16 +256,17 @@ namespace CovidDisplay
 
         private State BuildWorld()
         {
-            var startDate = StartDatePicker.SelectedDate.Value;
-            var world = new State()
+            var endDate = GetDatePicker.SelectedDate.Value;
+            var range = (int)RangePicker.Value * -1;
+            var world = new State(endDate.AddDays(range), endDate)
             {
                 Name = "World",
                 Population = 7742277000.0
             };
 
-            for (DateTime i = startDate; i < DateTime.Today; i = i.AddDays(1))
+            for (DateTime i = endDate.AddDays(range); i <= endDate; i = i.AddDays(1))
             {
-                var dailyNumbers = new DailyNumbers(i);
+                var dailyNumbers = world.DailyNumbers.SingleOrDefault(d => d.Date == i);
                 var vac = vaccinesList.Where(v => v.date == i.ToString("yyyy-MM-dd") && v.location == "World").FirstOrDefault();
 
                 if (vac != null)
@@ -302,10 +299,11 @@ namespace CovidDisplay
 
         private List<JsonDailyData> GetDailyData()
         {
-            var startDate = StartDatePicker.SelectedDate.Value;
+            var endDate = GetDatePicker.SelectedDate.Value;
+            var range = (int)RangePicker.Value * -1;
             var filePath = FilePathTextbox.Text;
             var resultsList = new List<JsonDailyData>();
-            for (var i = startDate; i < DateTime.Now; i = i.AddDays(1))
+            for (var i = endDate.AddDays(range); i <= endDate; i = i.AddDays(1))
             {
                 try
                 {

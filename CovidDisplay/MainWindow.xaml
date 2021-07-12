@@ -3,14 +3,22 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:local="clr-namespace:CovidDisplay"
         Loaded="OnLoaded"
         mc:Ignorable="d"
         Title="Corona Bucket"
         Height="600"
-        Width="1000">
+        Width="1100">
     <Window.Resources>
         <Style TargetType="Label">
+            <Setter Property="Padding"
+                    Value="0" />
+            <Setter Property="FontSize"
+                    Value="14" />
+        </Style>
+
+        <Style TargetType="TextBlock">
             <Setter Property="Padding"
                     Value="0" />
             <Setter Property="FontSize"
@@ -40,11 +48,16 @@
                     Grid.Column="0"
                     Grid.Row="0"
                     Margin="4,0">
-            <Label Content="Start Date:"
+            <Label Content="Get Date:"
                    VerticalAlignment="Center" />
-            <DatePicker Name="StartDatePicker"
+            <DatePicker Name="GetDatePicker"
                         Margin="4"
                         VerticalAlignment="Center" />
+            <Label Content="Range:"
+                   VerticalAlignment="Center"
+                   Margin="8" />
+            <xctk:IntegerUpDown Name="RangePicker"
+                                VerticalAlignment="Center" />
         </StackPanel>
 
         <Grid Grid.Column="2"
@@ -124,7 +137,7 @@
                     <TextBlock Text="(" />
                     <TextBlock Text="{Binding Change.DosesTotal, StringFormat='{}{0:#,#}'}" />
                     <TextBlock Text=" | " />
-                    <TextBlock Text="{Binding Trend.DosesTotal, StringFormat='{}{0:#,#}'}" />
+                    <TextBlock Text="{Binding SevenDay.DosesTotal, StringFormat='{}{0:#,#}'}" />
                     <TextBlock Text=")" />
                 </StackPanel>
 
@@ -139,7 +152,7 @@
                     <TextBlock Text="(" />
                     <TextBlock Text="{Binding Change.DosesFirst, StringFormat='{}{0:#,#}'}" />
                     <TextBlock Text=" | " />
-                    <TextBlock Text="{Binding Trend.DosesFirst, StringFormat='{}{0:#,#}'}" />
+                    <TextBlock Text="{Binding SevenDay.DosesFirst, StringFormat='{}{0:#,#}'}" />
                     <TextBlock Text=")" />
                 </StackPanel>
 
@@ -154,7 +167,7 @@
                     <TextBlock Text="(" />
                     <TextBlock Text="{Binding Change.DosesFully, StringFormat='{}{0:#,#}'}" />
                     <TextBlock Text=" | " />
-                    <TextBlock Text="{Binding Trend.DosesFully, StringFormat='{}{0:#,#}'}" />
+                    <TextBlock Text="{Binding SevenDay.DosesFully, StringFormat='{}{0:#,#}'}" />
                     <TextBlock Text=")" />
                 </StackPanel>
 
@@ -173,7 +186,7 @@
                     <TextBlock Text="(" />
                     <TextBlock Text="{Binding Change.Confirmed, StringFormat='{}{0:#,#}'}" />
                     <TextBlock Text=" | " />
-                    <TextBlock Text="{Binding Trend.Confirmed, StringFormat='{}{0:#,#}'}" />
+                    <TextBlock Text="{Binding SevenDay.Confirmed, StringFormat='{}{0:#,#}'}" />
                     <TextBlock Text=")" />
                 </StackPanel>
 
@@ -188,7 +201,7 @@
                     <TextBlock Text="(" />
                     <TextBlock Text="{Binding Change.Deaths, StringFormat='{}{0:#,#}'}" />
                     <TextBlock Text=" | " />
-                    <TextBlock Text="{Binding Trend.Deaths, StringFormat='{}{0:#,#}'}" />
+                    <TextBlock Text="{Binding SevenDay.Deaths, StringFormat='{}{0:#,#}'}" />
                     <TextBlock Text=")" />
                 </StackPanel>
 
@@ -203,7 +216,7 @@
                     <TextBlock Text="(" />
                     <TextBlock Text="{Binding Change.Recovered, StringFormat='{}{0:#,#}'}" />
                     <TextBlock Text=" | " />
-                    <TextBlock Text="{Binding Trend.Recovered, StringFormat='{}{0:#,#}'}" />
+                    <TextBlock Text="{Binding SevenDay.Recovered, StringFormat='{}{0:#,#}'}" />
                     <TextBlock Text=")" />
                 </StackPanel>
 
@@ -218,7 +231,7 @@
                     <TextBlock Text="(" />
                     <TextBlock Text="{Binding Change.Unresolved, StringFormat='{}{0:#,#}'}" />
                     <TextBlock Text=" | " />
-                    <TextBlock Text="{Binding Trend.Unresolved, StringFormat='{}{0:#,#}'}" />
+                    <TextBlock Text="{Binding SevenDay.Unresolved, StringFormat='{}{0:#,#}'}" />
                     <TextBlock Text=")" />
                 </StackPanel>
             </Grid>
