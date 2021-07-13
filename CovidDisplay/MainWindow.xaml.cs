@@ -28,7 +28,7 @@ namespace CovidDisplay
         {
             FilePathTextbox.Text = @"D:\temp\";
             RangePicker.Value = 7;
-            GetDatePicker.SelectedDate = DateTime.Today;
+            GetDatePicker.SelectedDate = DateTime.Today.AddDays(-1);
         }
 
         private void Refresh()
@@ -264,11 +264,9 @@ namespace CovidDisplay
                 Population = 7742277000.0
             };
 
-            for (DateTime i = endDate.AddDays(range); i <= endDate; i = i.AddDays(1))
+            foreach (var dailyNumbers in world.DailyNumbers)
             {
-                var dailyNumbers = world.DailyNumbers.SingleOrDefault(d => d.Date == i);
-                var vac = vaccinesList.Where(v => v.date == i.ToString("yyyy-MM-dd") && v.location == "World").FirstOrDefault();
-
+                var vac = vaccinesList.SingleOrDefault(v => v.location == "World" && v.date == dailyNumbers.Date.ToString("yyyy-MM-dd"));
                 if (vac != null)
                 {
                     double.TryParse(vac.total_vaccinations, out double total);
@@ -280,7 +278,7 @@ namespace CovidDisplay
                     dailyNumbers.DosesFully = fully;
                 }
 
-                foreach (var cases in casesList.Where(c => c.date == i))
+                foreach (var cases in casesList.Where(c => c.date == dailyNumbers.Date))
                 {
                     double.TryParse(cases.confirmed, out double confirmed);
                     double.TryParse(cases.deaths, out double deaths);
@@ -290,8 +288,25 @@ namespace CovidDisplay
                     dailyNumbers.Deaths += deaths;
                     dailyNumbers.Recovered += recovered;
                 }
+            }
 
-                world.DailyNumbers.Add(dailyNumbers);
+            for (int i = world.DailyNumbers.Count - 2; i >= 0; i--)
+            {
+                var dailyNumbers = world.DailyNumbers[i];
+                var previous = world.DailyNumbers[i + 1];
+                if (dailyNumbers.DosesTotal == 0)
+                {
+                    dailyNumbers.DosesTotal = previous.DosesTotal;
+                    dailyNumbers.DosesFirst = previous.DosesFirst;
+                    dailyNumbers.DosesFully = previous.DosesFully;
+                }
+
+                if (dailyNumbers.Confirmed == 0)
+                {
+                    dailyNumbers.Confirmed = previous.Confirmed;
+                    dailyNumbers.Deaths = previous.Deaths;
+                    dailyNumbers.Recovered = previous.Recovered;
+                }
             }
 
             return world;
