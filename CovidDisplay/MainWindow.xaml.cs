@@ -488,20 +488,23 @@ namespace CovidDisplay
 
         private void WriteWorld()
         {
+            var writeDate = GetDatePicker.SelectedDate.Value.AddDays(1);
             var filePath = FilePathTextbox.Text;
+
             var countdown = File.ReadAllLines(filePath + "Countdown.txt")[0].Split(';');
             var countdownDay = DateTime.Parse(countdown[0]);
             var countdownEvent = countdown[1];
 
-            var previousId = File.ReadAllLines(filePath + "Previously.txt")[0].Split(' ')[1];
-            var previousURL = "https://www.shacknews.com/chatty?id=" + previousId;
+            var previousList = File.ReadAllLines(filePath + "Previously.txt").ToList();
+            var previousId = previousList.SingleOrDefault(d => d.Contains(writeDate.AddDays(-1).ToString("yyyy-MM-dd"))).Split(';')[1];
+            var lastyearId = previousList.SingleOrDefault(d => d.Contains(writeDate.AddYears(-1).ToString("yyyy-MM-dd"))).Split(';')[1];
 
-            var txtFile = $"{DateTime.Now.ToString("MMdd")}_World-NEW.txt";
+            var txtFile = $"{writeDate.ToString("MMdd")}_World-NEW.txt";
             var lines = new List<string>();
 
             var us = ((List<State>)CountriesList.ItemsSource).FirstOrDefault(c => c.Name == "US");
 
-            lines.Add($"*[b{{Corona Bucket}}b]*: {(countdownDay - DateTime.Today).Days} Days Till {countdownEvent}");
+            lines.Add($"*[b{{Corona Bucket}}b]*: {(countdownDay - writeDate).Days} Days Till {countdownEvent}");
             lines.Add("");
             lines.AddRange(world.ToPost);
             lines.AddRange(us.ToPost);
@@ -518,16 +521,18 @@ namespace CovidDisplay
             lines.Add("https://foldingathome.org/");
             lines.Add("Join the Shacknews Folding@Home team to help fight COVID-19 https://apps.foldingathome.org/teamstats/team50784.html");
             lines.Add("");
-            lines.Add($"#COVID19{DateTime.Today.ToString("yyyyMMdd")}");
-            lines.Add($"Previously in the bucket: {previousURL}");
+            lines.Add($"#COVID19{writeDate.ToString("yyyyMMdd")}");
+            lines.Add($"Previously in the bucket: https://www.shacknews.com/chatty?id={previousId}");
+            lines.Add($"This time last year: https://www.shacknews.com/chatty?id={lastyearId}");
 
             File.WriteAllLines(Path.Combine(filePath, txtFile), lines);
         }
         private void WriteCountries()
         {
+            var writeDate = GetDatePicker.SelectedDate.Value;
             var filePath = FilePathTextbox.Text;
             var topCountries = ((List<State>)CountriesList.ItemsSource).Where(c => c.Name != "US").OrderByDescending(c => c.Percent.DosesFully).Take(15);
-            var txtFile = $"{DateTime.Today.ToString("MMdd")}_TopCountries-NEW.txt";
+            var txtFile = $"{writeDate.ToString("MMdd")}_TopCountries-NEW.txt";
             var lines = new List<string>();
             lines.Add("e[Top 15 Countries by Population Fully Vaccinated]e");
             lines.Add("");
@@ -539,9 +544,10 @@ namespace CovidDisplay
         }
         private void WriteStates()
         {
+            var writeDate = GetDatePicker.SelectedDate.Value;
             var filePath = FilePathTextbox.Text;
             var topStates = ((List<State>)StatesList.ItemsSource).OrderByDescending(s => s.Percent.DosesFully);
-            var txtFile = $"{DateTime.Today.ToString("MMdd")}_TopStates-NEW.txt";
+            var txtFile = $"{writeDate.ToString("MMdd")}_TopStates-NEW.txt";
             var lines = new List<string>();
             lines.Add("e[Top 15 US States by Population Fully Vaccinated]e");
             lines.Add("");
