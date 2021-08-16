@@ -529,7 +529,7 @@ namespace CovidDisplay
         }
         private void WriteCountries()
         {
-            var writeDate = GetDatePicker.SelectedDate.Value;
+            var writeDate = GetDatePicker.SelectedDate.Value.AddDays(1);
             var filePath = FilePathTextbox.Text;
             var topCountries = ((List<State>)CountriesList.ItemsSource).Where(c => c.Name != "US").OrderByDescending(c => c.Percent.DosesFully).Take(15);
             var txtFile = $"{writeDate.ToString("MMdd")}_TopCountries-NEW.txt";
@@ -544,7 +544,7 @@ namespace CovidDisplay
         }
         private void WriteStates()
         {
-            var writeDate = GetDatePicker.SelectedDate.Value;
+            var writeDate = GetDatePicker.SelectedDate.Value.AddDays(1);
             var filePath = FilePathTextbox.Text;
             var topStates = ((List<State>)StatesList.ItemsSource).OrderByDescending(s => s.Percent.DosesFully);
             var txtFile = $"{writeDate.ToString("MMdd")}_TopStates-NEW.txt";
