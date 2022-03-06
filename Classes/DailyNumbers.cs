@@ -13,6 +13,7 @@ namespace Classes
         public double DosesTotal { get; set; }
         public double DosesFirst { get; set; }
         public double DosesFully { get; set; }
+        public double DosesBooster { get; set; }
 
         public DailyNumbers()
         {

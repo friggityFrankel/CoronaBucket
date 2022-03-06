@@ -26,15 +26,13 @@ namespace CovidDisplay
         }
         private void OnLoaded(object sender, RoutedEventArgs e)
         {
-            FilePathTextbox.Text = @"D:\temp\";
+            FilePathTextbox.Text = @"C:\Users\nukem\OneDrive\Documents\CoronaBucket\";
             RangePicker.Value = 7;
             GetDatePicker.SelectedDate = DateTime.Today.AddDays(-1);
         }
 
         private void Refresh()
         {
-            DebugLabel.Content = "Retrieving...";
-
             casesList = GetDailyData();
             vaccinesList = GetVaccines();
             world = BuildWorld();
@@ -44,7 +42,6 @@ namespace CovidDisplay
 
             WorldResultsGrid.DataContext = world;
 
-            DebugLabel.Content = "Refresh Completed";
             WriteButton.IsEnabled = true;
         }
 
@@ -69,7 +66,6 @@ namespace CovidDisplay
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
-                DebugLabel.Content = ex.Message;
             }
             return jsonString;
         }
@@ -272,10 +268,12 @@ namespace CovidDisplay
                     double.TryParse(vac.total_vaccinations, out double total);
                     double.TryParse(vac.people_vaccinated, out double partial);
                     double.TryParse(vac.people_fully_vaccinated, out double fully);
+                    double.TryParse(vac.total_boosters, out double booster);
 
                     dailyNumbers.DosesTotal = total;
                     dailyNumbers.DosesFirst = partial;
                     dailyNumbers.DosesFully = fully;
+                    dailyNumbers.DosesBooster = booster;
                 }
 
                 foreach (var cases in casesList.Where(c => c.date == dailyNumbers.Date))
@@ -299,6 +297,7 @@ namespace CovidDisplay
                     dailyNumbers.DosesTotal = previous.DosesTotal;
                     dailyNumbers.DosesFirst = previous.DosesFirst;
                     dailyNumbers.DosesFully = previous.DosesFully;
+                    dailyNumbers.DosesBooster = previous.DosesBooster;
                 }
 
                 if (dailyNumbers.Confirmed == 0)
@@ -351,7 +350,6 @@ namespace CovidDisplay
                 catch (Exception ex)
                 {
                     Console.WriteLine($"Error: {ex.Message}");
-                    DebugLabel.Content = ex.Message;
                 }
             }
             return resultsList.OrderByDescending(d => d.date).ToList();
@@ -376,12 +374,16 @@ namespace CovidDisplay
                         total_vaccinations = dataItem[3],
                         people_vaccinated = dataItem[4],
                         people_fully_vaccinated = dataItem[5],
-                        daily_vaccinations_raw = dataItem[6],
-                        daily_vaccinations = dataItem[7],
-                        total_vaccinations_per_hundred = dataItem[8],
-                        people_vaccinated_per_hundred = dataItem[9],
-                        people_fully_vaccinated_per_hundred = dataItem[10],
-                        daily_vaccinations_per_million = dataItem[11]
+                        total_boosters = dataItem[6],
+                        daily_vaccinations_raw = dataItem[7],
+                        daily_vaccinations = dataItem[8],
+                        total_vaccinations_per_hundred = dataItem[9],
+                        people_vaccinated_per_hundred = dataItem[10],
+                        people_fully_vaccinated_per_hundred = dataItem[11],
+                        total_boosters_per_hundred = dataItem[12],
+                        daily_vaccinations_per_million = dataItem[13],
+                        daily_people_vaccinated = dataItem[14],
+                        daily_people_vaccinated_per_hundred = dataItem[15],
                     };
                     vacList.Add(vacItem);
                 }
@@ -472,8 +474,6 @@ namespace CovidDisplay
             WriteCountries();
             WriteStates();
 
-            DebugLabel.Content = "Write Completed";
-
             var filePath = FilePathTextbox.Text;
             if (Directory.Exists(filePath))
             {
@@ -492,8 +492,13 @@ namespace CovidDisplay
             var filePath = FilePathTextbox.Text;
 
             var countdown = File.ReadAllLines(filePath + "Countdown.txt")[0].Split(';');
-            var countdownDay = DateTime.Parse(countdown[0]);
-            var countdownEvent = countdown[1];
+            var countdownText = "";
+            if (countdown.Length > 1)
+            {
+                var countdownDay = DateTime.Parse(countdown[0]);
+                var countdownEvent = countdown[1];
+                countdownText = $": { (countdownDay - writeDate).Days} Days Till { countdownEvent}";
+            }
 
             var previousList = File.ReadAllLines(filePath + "Previously.txt").ToList();
             var previousId = previousList.SingleOrDefault(d => d.Contains(writeDate.AddDays(-1).ToString("yyyy-MM-dd"))).Split(';')[1];
@@ -504,7 +509,7 @@ namespace CovidDisplay
 
             var us = ((List<State>)CountriesList.ItemsSource).FirstOrDefault(c => c.Name == "US");
 
-            lines.Add($"*[b{{Corona Bucket}}b]*: {(countdownDay - writeDate).Days} Days Till {countdownEvent}");
+            lines.Add($"*[b{{Corona Bucket}}b]*{countdownText}");
             lines.Add("");
             lines.AddRange(world.ToPost);
             lines.AddRange(us.ToPost);
@@ -521,12 +526,16 @@ namespace CovidDisplay
             lines.Add("https://foldingathome.org/");
             lines.Add("Join the Shacknews Folding@Home team to help fight COVID-19 https://apps.foldingathome.org/teamstats/team50784.html");
             lines.Add("");
+            lines.Add("Free At Home COVID-19 Tests (US Only)");
+            lines.Add("https://www.covidtests.gov/");
+            lines.Add("");
             lines.Add($"#COVID19{writeDate.ToString("yyyyMMdd")}");
             lines.Add($"Previously in the bucket: https://www.shacknews.com/chatty?id={previousId}");
             lines.Add($"This time last year: https://www.shacknews.com/chatty?id={lastyearId}");
 
             File.WriteAllLines(Path.Combine(filePath, txtFile), lines);
         }
+
         private void WriteCountries()
         {
             var writeDate = GetDatePicker.SelectedDate.Value.AddDays(1);
@@ -556,10 +565,17 @@ namespace CovidDisplay
                 lines.AddRange(state.ToPost);
             }
             lines.Add("\n\n\n\n");
+            lines.Add("e[Dumbest 15 US States by Population Unvaccinated]e");
+            lines.Add("");
+            foreach (var state in topStates.TakeLast(15).OrderBy(s => s.Percent.DosesFirst))
+            {
+                lines.AddRange(state.ToPost);
+            }
+            lines.Add("\n\n\n\n");
             lines.Add("e[Remaining US States Alphabetically]e");
             lines.Add("");
             var i = 0;
-            foreach (var state in topStates.Skip(15).OrderBy(s => s.Name))
+            foreach (var state in topStates.Skip(15).SkipLast(15).OrderBy(s => s.Name))
             {
                 lines.AddRange(state.ToPost);
                 i++;
@@ -570,8 +586,21 @@ namespace CovidDisplay
             }
             File.WriteAllLines(Path.Combine(filePath, txtFile), lines);
         }
+        private void CopyCountry()
+        {
+            if (CountriesList.SelectedItem is State state)
+            {
+                var post = "";
+                foreach (var item in state.ToPost)
+                {
+                    post += item + "\n";
+                }
+                Clipboard.SetText(post.Trim());
+            }
+        }
 
         private void Refresh_Click(object sender, RoutedEventArgs e) { Refresh(); }
+        private void Copy_Click(object sender, RoutedEventArgs e) { CopyCountry(); }
         private void Write_Click(object sender, RoutedEventArgs e) { WriteAll(); }
 
         private void StateSelection_Changed(object sender, SelectionChangedEventArgs e)
@@ -586,6 +615,5 @@ namespace CovidDisplay
 
             }
         }
-
     }
 }
