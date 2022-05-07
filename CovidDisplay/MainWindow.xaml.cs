@@ -529,6 +529,9 @@ namespace CovidDisplay
             lines.Add("Free At Home COVID-19 Tests (US Only)");
             lines.Add("https://www.covidtests.gov/");
             lines.Add("");
+            lines.Add("COVID-19 Therapeutics Locator");
+            lines.Add("https://covid-19-therapeutics-locator-dhhs.hub.arcgis.com/");
+            lines.Add("");
             lines.Add($"#COVID19{writeDate.ToString("yyyyMMdd")}");
             lines.Add($"Previously in the bucket: https://www.shacknews.com/chatty?id={previousId}");
             lines.Add($"This time last year: https://www.shacknews.com/chatty?id={lastyearId}");
