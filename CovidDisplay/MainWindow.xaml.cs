@@ -16,9 +16,10 @@ namespace CovidDisplay
     /// </summary>
     public partial class MainWindow : Window
     {
-        public State world;
+        public Country world;
         public List<JsonDailyData> casesList;
         public List<JsonVaccineData> vaccinesList;
+        public List<JsonCountryData> countriesList;
 
         public MainWindow()
         {
@@ -33,12 +34,15 @@ namespace CovidDisplay
 
         private void Refresh()
         {
+            countriesList = GetCountryData();
             casesList = GetDailyData();
             vaccinesList = GetVaccines();
-            world = BuildWorld();
 
-            CountriesList.ItemsSource = BuildCountryList();
+
+            CountriesList.ItemsSource = BuildCountries();
             StatesList.ItemsSource = BuildUnitedStatesList();
+
+            world = ((List<Country>)CountriesList.ItemsSource).FirstOrDefault(c => c.Name == "World"); ;
 
             WorldResultsGrid.DataContext = world;
 
@@ -47,7 +51,7 @@ namespace CovidDisplay
 
         private string GetJsonString(string jsonQuery)
         {
-            string jsonString = "";
+            var jsonString = "";
             try
             {
                 using (var client = new HttpClient())
@@ -79,7 +83,7 @@ namespace CovidDisplay
             // Build Countries with populations
             var countryInfoList = GetCountryInfo();
             var populationList = GetPopulations();
-            foreach (var countryInfo in countryInfoList.countries)
+            foreach (var countryInfo in countryInfoList.countries!)
             {
                 var newCountry = new State(endDate.AddDays(range), endDate)
                 {
@@ -139,7 +143,7 @@ namespace CovidDisplay
 
             foreach (var country in countryList)
             {
-                for (int i = country.DailyNumbers.Count - 2; i >= 0; i--)
+                for (var i = country.DailyNumbers.Count - 2; i >= 0; i--)
                 {
                     var dailyNumbers = country.DailyNumbers[i];
                     var previous = country.DailyNumbers[i + 1];
@@ -265,10 +269,10 @@ namespace CovidDisplay
                 var vac = vaccinesList.SingleOrDefault(v => v.location == "World" && v.date == dailyNumbers.Date.ToString("yyyy-MM-dd"));
                 if (vac != null)
                 {
-                    double.TryParse(vac.total_vaccinations, out double total);
-                    double.TryParse(vac.people_vaccinated, out double partial);
-                    double.TryParse(vac.people_fully_vaccinated, out double fully);
-                    double.TryParse(vac.total_boosters, out double booster);
+                    double.TryParse(vac.total_vaccinations, out var total);
+                    double.TryParse(vac.people_vaccinated, out var partial);
+                    double.TryParse(vac.people_fully_vaccinated, out var fully);
+                    double.TryParse(vac.total_boosters, out var booster);
 
                     dailyNumbers.DosesTotal = total;
                     dailyNumbers.DosesFirst = partial;
@@ -288,7 +292,7 @@ namespace CovidDisplay
                 }
             }
 
-            for (int i = world.DailyNumbers.Count - 2; i >= 0; i--)
+            for (var i = world.DailyNumbers.Count - 2; i >= 0; i--)
             {
                 var dailyNumbers = world.DailyNumbers[i];
                 var previous = world.DailyNumbers[i + 1];
@@ -309,6 +313,167 @@ namespace CovidDisplay
             }
 
             return world;
+        }
+
+        private List<Country> BuildCountries()
+        {
+            var resultsList = new List<Country>();
+            try
+            {
+                foreach (var item in countriesList)
+                {
+                    Country country;
+                    CountryNumbers numbers = new CountryNumbers();
+
+                    if (resultsList.Find(c => c.Name == item.location) != null)
+                    {
+                        country = resultsList.First(c => c.Name == item.location);
+                    }
+                    else
+                    {
+                        //country = new Country() { Name = item.location };
+                        resultsList.Add(country = new Country() { Name = item.location });
+                    }
+
+                    double.TryParse(item.population, out var population);
+
+                    double.TryParse(item.total_vaccinations, out var vacTotal);
+                    double.TryParse(item.people_vaccinated, out var vacFirst);
+                    double.TryParse(item.people_fully_vaccinated, out var vacFully);
+                    double.TryParse(item.total_boosters, out var vacBoost);
+                    double.TryParse(item.total_cases, out var casesTotal);
+                    double.TryParse(item.total_deaths, out var deathsTotal);
+
+                    double.TryParse(item.new_vaccinations, out var vacTotalNew);
+                    double.TryParse(item.new_cases, out var casesNew);
+                    double.TryParse(item.new_deaths, out var deathsNew);
+
+                    double.TryParse(item.new_vaccinations_smoothed, out var vacNewSmooth);
+                    double.TryParse(item.new_people_vaccinated_smoothed, out var vacFirstSmooth);
+                    double.TryParse(item.new_cases_smoothed, out var casesSmooth);
+                    double.TryParse(item.new_deaths_smoothed, out var deathsSmooth);
+
+                    numbers.Population = population;
+                    numbers.DoseTotal = vacTotal;
+                    numbers.DoseFirst = vacFirst;
+                    numbers.DoseFully = vacFully;
+                    numbers.DoseBooster = vacBoost;
+                    numbers.Confirmed = casesTotal;
+                    numbers.Deaths = deathsTotal;
+
+                    country.Numbers.Add(numbers);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                throw;
+            }
+
+            return resultsList;
+        }
+
+        private List<JsonCountryData> GetCountryData()
+        {
+            var filePath = FilePathTextbox.Text;
+            var fileName = DateTime.Now.ToString("yyyyMMdd") + ".txt";
+            var resultsList = new List<JsonCountryData>();
+            try
+            {
+                var jsonString = GetJsonString("https://raw.githubusercontent.com/owid/covid-19-data/master/public/data/latest/owid-covid-latest.csv");
+                if (!string.IsNullOrWhiteSpace(jsonString))
+                {
+                    File.WriteAllText(Path.Combine(filePath + @"json\", fileName), jsonString);
+
+                    for (var i = 0; i < 7; i++)
+                    {
+                        fileName = DateTime.Now.AddDays(-i).ToString("yyyyMMdd") + ".txt";
+                        jsonString = File.ReadAllText(Path.Combine(filePath + @"json\", fileName));
+                        var dataList = jsonString.Split("\n");
+                        for (var j = 1; j < dataList.Length - 1; j++)
+                        {
+                            var dataItem = dataList[j].Split(',');
+                            var countryItem = new JsonCountryData()
+                            {
+                                iso_code = dataItem[0],
+                                continent = dataItem[1],
+                                location = dataItem[2],
+                                last_updated_date = dataItem[3],
+                                total_cases = dataItem[4],
+                                new_cases = dataItem[5],
+                                new_cases_smoothed = dataItem[6],
+                                total_deaths = dataItem[7],
+                                new_deaths = dataItem[8],
+                                new_deaths_smoothed = dataItem[9],
+                                total_cases_per_million = dataItem[10],
+                                new_cases_per_million = dataItem[11],
+                                new_cases_smoothed_per_million = dataItem[12],
+                                total_deaths_per_million = dataItem[13],
+                                new_deaths_per_million = dataItem[14],
+                                new_deaths_smoothed_per_million = dataItem[15],
+                                reproduction_rate = dataItem[16],
+                                icu_patients = dataItem[17],
+                                icu_patients_per_million = dataItem[18],
+                                hosp_patients = dataItem[19],
+                                hosp_patients_per_million = dataItem[20],
+                                weekly_icu_admissions = dataItem[21],
+                                weekly_icu_admissions_per_million = dataItem[22],
+                                weekly_hosp_admissions = dataItem[23],
+                                weekly_hosp_admissions_per_million = dataItem[24],
+                                total_tests = dataItem[25],
+                                new_tests = dataItem[26],
+                                total_tests_per_thousand = dataItem[27],
+                                new_tests_per_thousand = dataItem[28],
+                                new_tests_smoothed = dataItem[29],
+                                new_tests_smoothed_per_thousand = dataItem[30],
+                                positive_rate = dataItem[31],
+                                tests_per_case = dataItem[32],
+                                tests_units = dataItem[33],
+                                total_vaccinations = dataItem[34],
+                                people_vaccinated = dataItem[35],
+                                people_fully_vaccinated = dataItem[36],
+                                total_boosters = dataItem[37],
+                                new_vaccinations = dataItem[38],
+                                new_vaccinations_smoothed = dataItem[39],
+                                total_vaccinations_per_hundred = dataItem[40],
+                                people_vaccinated_per_hundred = dataItem[41],
+                                people_fully_vaccinated_per_hundred = dataItem[42],
+                                total_boosters_per_hundred = dataItem[43],
+                                new_vaccinations_smoothed_per_million = dataItem[44],
+                                new_people_vaccinated_smoothed = dataItem[45],
+                                new_people_vaccinated_smoothed_per_hundred = dataItem[46],
+                                stringency_index = dataItem[47],
+                                population_density = dataItem[48],
+                                median_age = dataItem[49],
+                                aged_65_older = dataItem[50],
+                                aged_70_older = dataItem[51],
+                                gdp_per_capita = dataItem[52],
+                                extreme_poverty = dataItem[53],
+                                cardiovasc_death_rate = dataItem[54],
+                                diabetes_prevalence = dataItem[55],
+                                female_smokers = dataItem[56],
+                                male_smokers = dataItem[57],
+                                handwashing_facilities = dataItem[58],
+                                hospital_beds_per_thousand = dataItem[59],
+                                life_expectancy = dataItem[60],
+                                human_development_index = dataItem[61],
+                                population = dataItem[62],
+                                excess_mortality_cumulative_absolute = dataItem[63],
+                                excess_mortality_cumulative = dataItem[64],
+                                excess_mortality = dataItem[65],
+                                excess_mortality_cumulative_per_million = dataItem[66]
+                            };
+                            resultsList.Add(countryItem);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+            }
+
+            return resultsList;
         }
 
         private List<JsonDailyData> GetDailyData()
@@ -501,13 +666,13 @@ namespace CovidDisplay
             }
 
             var previousList = File.ReadAllLines(filePath + "Previously.txt").ToList();
-            var previousId = previousList.SingleOrDefault(d => d.Contains(writeDate.AddDays(-1).ToString("yyyy-MM-dd"))).Split(';')[1];
+            var previousId = previousList.First().Split(';')[1];
             var lastyearId = previousList.SingleOrDefault(d => d.Contains(writeDate.AddYears(-1).ToString("yyyy-MM-dd"))).Split(';')[1];
 
             var txtFile = $"{writeDate.ToString("MMdd")}_World-NEW.txt";
             var lines = new List<string>();
 
-            var us = ((List<State>)CountriesList.ItemsSource).FirstOrDefault(c => c.Name == "US");
+            var us = ((List<Country>)CountriesList.ItemsSource).FirstOrDefault(c => c.Name == "United States");
 
             lines.Add($"*[b{{Corona Bucket}}b]*{countdownText}");
             lines.Add("");
@@ -519,15 +684,12 @@ namespace CovidDisplay
             lines.Add("Johns Hopkins University COVID-19 Dashboard");
             lines.Add("https://gisanddata.maps.arcgis.com/apps/opsdashboard/index.html#/bda7594740fd40299423467b48e9ecf6");
             lines.Add("");
-            lines.Add("NYTimes US Hotspot Tracker");
-            lines.Add("https://www.nytimes.com/interactive/2020/us/coronavirus-us-cases.html?#hotspots");
+            lines.Add("NYTimes US Covid-19 Tracker");
+            lines.Add("https://www.nytimes.com/interactive/2023/us/covid-cases.html");
             lines.Add("");
             lines.Add("Folding @Home");
             lines.Add("https://foldingathome.org/");
             lines.Add("Join the Shacknews Folding@Home team to help fight COVID-19 https://apps.foldingathome.org/teamstats/team50784.html");
-            lines.Add("");
-            lines.Add("Free At Home COVID-19 Tests (US Only)");
-            lines.Add("https://www.covidtests.gov/");
             lines.Add("");
             lines.Add("COVID-19 Therapeutics Locator");
             lines.Add("https://covid-19-therapeutics-locator-dhhs.hub.arcgis.com/");
@@ -543,7 +705,7 @@ namespace CovidDisplay
         {
             var writeDate = GetDatePicker.SelectedDate.Value.AddDays(1);
             var filePath = FilePathTextbox.Text;
-            var topCountries = ((List<State>)CountriesList.ItemsSource).Where(c => c.Name != "US").OrderByDescending(c => c.Percent.DosesFully).Take(15);
+            var topCountries = ((List<Country>)CountriesList.ItemsSource).Where(c => c.Name != "United States" && c.Name != "World" && c.Population > 1000000).OrderByDescending(c => c.DoseFullyPercent).Take(15);
             var txtFile = $"{writeDate.ToString("MMdd")}_TopCountries-NEW.txt";
             var lines = new List<string>();
             lines.Add("e[Top 15 Countries by Population Fully Vaccinated]e");
@@ -608,7 +770,7 @@ namespace CovidDisplay
 
         private void StateSelection_Changed(object sender, SelectionChangedEventArgs e)
         {
-            if (sender is ListBox listBox && listBox.SelectedItem is State state)
+            if (sender is ListBox listBox && listBox.SelectedItem is Country state)
             {
                 WorldResultsGrid.DataContext = state;
             }

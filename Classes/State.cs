@@ -176,10 +176,14 @@ namespace Classes
                     {
                         lines.Add($"• Boosters Administered: {Current.DosesBooster.ToString("N0", CultureInfo.CurrentCulture)} s[{Percent.DosesBooster.ToString("N2", CultureInfo.CurrentCulture)}%]s (+{Change.DosesBooster.ToString("N0", CultureInfo.CurrentCulture)} | +{SevenDay.DosesBooster.ToString("N0", CultureInfo.CurrentCulture)})".Replace("+-", "-"));
                     }
-                    
-                    lines.Add("---");
-                    lines.Add($"• Cases: {Current.Confirmed.ToString("N0", CultureInfo.CurrentCulture)} s[{Percent.Confirmed.ToString("N2", CultureInfo.CurrentCulture)}%]s (+{Change.Confirmed.ToString("N0", CultureInfo.CurrentCulture)} | +{SevenDay.Confirmed.ToString("N0", CultureInfo.CurrentCulture)})".Replace("+-", "-"));
-                    lines.Add($"• Deaths: {Current.Deaths.ToString("N0", CultureInfo.CurrentCulture)} (+{Change.Deaths.ToString("N0", CultureInfo.CurrentCulture)} | +{SevenDay.Deaths.ToString("N0", CultureInfo.CurrentCulture)})".Replace("+-", "-"));
+
+                    if (Current.Confirmed > 0 && Current.Deaths > 0)
+                    {
+                        lines.Add("---");
+                        lines.Add($"• Cases: {Current.Confirmed.ToString("N0", CultureInfo.CurrentCulture)} s[{Percent.Confirmed.ToString("N2", CultureInfo.CurrentCulture)}%]s (+{Change.Confirmed.ToString("N0", CultureInfo.CurrentCulture)} | +{SevenDay.Confirmed.ToString("N0", CultureInfo.CurrentCulture)})".Replace("+-", "-"));
+                        lines.Add($"• Deaths: {Current.Deaths.ToString("N0", CultureInfo.CurrentCulture)} (+{Change.Deaths.ToString("N0", CultureInfo.CurrentCulture)} | +{SevenDay.Deaths.ToString("N0", CultureInfo.CurrentCulture)})".Replace("+-", "-"));
+                        
+                    }
                     lines.Add("");
                 }
                 return lines;
